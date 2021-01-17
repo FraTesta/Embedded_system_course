@@ -15,6 +15,8 @@
 
 #define LCD1 1
 #define LCD2_S6 2
+//buffer 
+#define UART_BUFF_DIM 100
 
 // data 
 typedef struct{
@@ -27,6 +29,8 @@ typedef struct{
 int lcd_mode;
 float* temp_buffer; 
 int uC_state;
+
+
 
 #endif	/* XC_HEADER_GLOBAL_H */
 

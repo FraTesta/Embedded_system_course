@@ -25,6 +25,7 @@ Command:
   build/default/production/myUART.o \
   build/default/production/parser.o \
   build/default/production/timerFunc.o \
+  build/default/production/myBuffer.o \
   --defsym=__MPLAB_BUILD=1 \
   -Tp30F4011.gld.00 \
   --stack=16 \
@@ -93,19 +94,19 @@ Default Scalar Model: Small
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x100               0x326           0x4b9  (1209)
-.text                        0x426               0x464           0x696  (1686)
-.dinit                       0x88a                 0x8             0xc  (12)
+.text                        0x426               0x598           0x864  (2148)
+.dinit                       0x9be                 0x8             0xc  (12)
 
-                 Total "program" memory used (bytes):          0xb5b  (2907) 5%
+                 Total "program" memory used (bytes):          0xd29  (3369) 6%
 
 
 "data" Memory  [Origin = 0x800, Length = 0x800]
 
 section                    address      alignment gaps    total length  (dec)
 -------                    -------      --------------    -------------------
-.nbss                        0x800                   0             0x6  (6)
+.nbss                        0x800                   0            0x7e  (126)
 
-                 Total "data" memory used (bytes):            0x6  (6) <1%
+                 Total "data" memory used (bytes):           0x7e  (126) 6%
 
 
 Dynamic Memory Usage
@@ -113,9 +114,9 @@ Dynamic Memory Usage
 region                     address                      maximum length  (dec)
 ------                     -------                      ---------------------
 heap                             0                                   0  (0)
-stack                        0x806                               0x7fa  (2042)
+stack                        0x87e                               0x782  (1922)
 
-                 Maximum dynamic memory (bytes):          0x7fa  (2042)
+                 Maximum dynamic memory (bytes):          0x782  (1922)
 
 Info: Project is using a large data memory model when small data memory model is sufficient.
 
@@ -125,10 +126,14 @@ External Symbols in Data Memory (by address):
                     0x0800                  _lcd_mode
                     0x0802                  _temp_buffer
                     0x0804                  _uC_state
+                    0x0806                  _UARTbuf
+                    0x080e                  _pstate
 
 External Symbols in Data Memory (by name):
 
+                    0x0806                  _UARTbuf
                     0x0800                  _lcd_mode
+                    0x080e                  _pstate
                     0x0802                  _temp_buffer
                     0x0804                  _uC_state
 
@@ -158,23 +163,28 @@ External Symbols in Program Memory (by address):
                   0x00055a                  _adc_config
                   0x0005c8                  _adc_config_2_chan
                   0x000662                  _parse_byte
-                  0x000758                  _scheduler
-                  0x0007be                  _task_PWM_controller
-                  0x0007c6                  _task_temperature_acquisition
-                  0x0007ce                  _task_send_temperature
-                  0x0007d6                  _task_feedback_ack
-                  0x0007de                  _task_LED_blink
-                  0x0007e6                  _task_LCD
-                  0x0007ee                  _task_receiver
-                  0x0007f6                  _main
-                  0x000814                  _UART_config
-                  0x00083c                  _send_string_UART2
-                  0x000868                  _PWM_config
+                  0x000758                  _initBuf
+                  0x000774                  _writeBuf
+                  0x0007aa                  _readBuf
+                  0x0007f6                  _sizeBuf
+                  0x000826                  _task_PWM_controller
+                  0x00082e                  _task_temperature_acquisition
+                  0x000836                  _task_send_temperature
+                  0x00083e                  _task_feedback_ack
+                  0x000846                  _task_LED_blink
+                  0x00084e                  _task_LCD
+                  0x000856                  _task_receiver
+                  0x000890                  _msg_handler
+                  0x0008ae                  _main
+                  0x0008e2                  _scheduler
+                  0x000948                  _UART_config
+                  0x000970                  _send_string_UART2
+                  0x00099c                  _PWM_config
 
 External Symbols in Program Memory (by name):
 
-                  0x000868                  _PWM_config
-                  0x000814                  _UART_config
+                  0x00099c                  _PWM_config
+                  0x000948                  _UART_config
                   0x0001c8                  __DefaultInterrupt
                   0x0001ce                  ___divsf3
                   0x000252                  ___fixunssfsi
@@ -194,21 +204,26 @@ External Symbols in Program Memory (by name):
                   0x000100                  __resetPRI
                   0x00055a                  _adc_config
                   0x0005c8                  _adc_config_2_chan
-                  0x0007f6                  _main
+                  0x000758                  _initBuf
+                  0x0008ae                  _main
+                  0x000890                  _msg_handler
                   0x000662                  _parse_byte
-                  0x000758                  _scheduler
-                  0x00083c                  _send_string_UART2
+                  0x0007aa                  _readBuf
+                  0x0008e2                  _scheduler
+                  0x000970                  _send_string_UART2
+                  0x0007f6                  _sizeBuf
                   0x00041a                  _strlen
-                  0x0007e6                  _task_LCD
-                  0x0007de                  _task_LED_blink
-                  0x0007be                  _task_PWM_controller
-                  0x0007d6                  _task_feedback_ack
-                  0x0007ee                  _task_receiver
-                  0x0007ce                  _task_send_temperature
-                  0x0007c6                  _task_temperature_acquisition
+                  0x00084e                  _task_LCD
+                  0x000846                  _task_LED_blink
+                  0x000826                  _task_PWM_controller
+                  0x00083e                  _task_feedback_ack
+                  0x000856                  _task_receiver
+                  0x000836                  _task_send_temperature
+                  0x00082e                  _task_temperature_acquisition
                   0x0004b4                  _tmr_setup_period
                   0x000426                  _tmr_wait_ms
                   0x000528                  _tmr_wait_period
+                  0x000774                  _writeBuf
 
 Memory Configuration
 
@@ -242,6 +257,7 @@ LOAD build/default/production/myScheduler.o
 LOAD build/default/production/myUART.o
 LOAD build/default/production/parser.o
 LOAD build/default/production/timerFunc.o
+LOAD build/default/production/myBuffer.o
                     0x0001                  __MPLAB_BUILD = 0x1
 LOAD p30F4011
 LOAD c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libfx-elf.a
@@ -373,54 +389,59 @@ userdata
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x2440
+.debug_info       0x000000       0x2b15
  *(.debug_info)
- .debug_info      0x000000        0x3c0 build/default/production/main.o
- .debug_info      0x0003c0        0xa43 build/default/production/myADC.o
- .debug_info      0x000e03        0x483 build/default/production/_ext/765096591/myPWM.o
- .debug_info      0x001286        0x213 build/default/production/myScheduler.o
- .debug_info      0x001499        0x7c2 build/default/production/myUART.o
- .debug_info      0x001c5b        0x1a2 build/default/production/parser.o
- .debug_info      0x001dfd        0x643 build/default/production/timerFunc.o
+ .debug_info      0x000000        0x6f1 build/default/production/main.o
+ .debug_info      0x0006f1        0xa43 build/default/production/myADC.o
+ .debug_info      0x001134        0x483 build/default/production/_ext/765096591/myPWM.o
+ .debug_info      0x0015b7        0x213 build/default/production/myScheduler.o
+ .debug_info      0x0017ca        0x7c2 build/default/production/myUART.o
+ .debug_info      0x001f8c        0x1a2 build/default/production/parser.o
+ .debug_info      0x00212e        0x643 build/default/production/timerFunc.o
+ .debug_info      0x002771        0x3a4 build/default/production/myBuffer.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000        0x56d
+.debug_abbrev     0x000000        0x70c
  *(.debug_abbrev)
- .debug_abbrev    0x000000         0xc2 build/default/production/main.o
- .debug_abbrev    0x0000c2         0xd6 build/default/production/myADC.o
- .debug_abbrev    0x000198         0xc3 build/default/production/_ext/765096591/myPWM.o
- .debug_abbrev    0x00025b         0x9f build/default/production/myScheduler.o
- .debug_abbrev    0x0002fa        0x103 build/default/production/myUART.o
- .debug_abbrev    0x0003fd         0x8b build/default/production/parser.o
- .debug_abbrev    0x000488         0xe5 build/default/production/timerFunc.o
+ .debug_abbrev    0x000000        0x188 build/default/production/main.o
+ .debug_abbrev    0x000188         0xd6 build/default/production/myADC.o
+ .debug_abbrev    0x00025e         0xc3 build/default/production/_ext/765096591/myPWM.o
+ .debug_abbrev    0x000321         0x9f build/default/production/myScheduler.o
+ .debug_abbrev    0x0003c0        0x103 build/default/production/myUART.o
+ .debug_abbrev    0x0004c3         0x8b build/default/production/parser.o
+ .debug_abbrev    0x00054e         0xe5 build/default/production/timerFunc.o
+ .debug_abbrev    0x000633         0xd9 build/default/production/myBuffer.o
 
-.debug_line       0x000000        0x5cc
+.debug_line       0x000000        0x800
  *(.debug_line)
- .debug_line      0x000000         0x5e build/default/production/main.o
- .debug_line      0x00005e        0x134 build/default/production/myADC.o
- .debug_line      0x000192        0x126 build/default/production/_ext/765096591/myPWM.o
- .debug_line      0x0002b8         0x57 build/default/production/myScheduler.o
- .debug_line      0x00030f        0x112 build/default/production/myUART.o
- .debug_line      0x000421         0x6f build/default/production/parser.o
- .debug_line      0x000490        0x13c build/default/production/timerFunc.o
+ .debug_line      0x000000        0x164 build/default/production/main.o
+ .debug_line      0x000164        0x134 build/default/production/myADC.o
+ .debug_line      0x000298        0x126 build/default/production/_ext/765096591/myPWM.o
+ .debug_line      0x0003be         0x57 build/default/production/myScheduler.o
+ .debug_line      0x000415        0x112 build/default/production/myUART.o
+ .debug_line      0x000527         0x6f build/default/production/parser.o
+ .debug_line      0x000596        0x13c build/default/production/timerFunc.o
+ .debug_line      0x0006d2        0x12e build/default/production/myBuffer.o
 
-.debug_frame      0x000000        0x268
+.debug_frame      0x000000        0x2fe
  *(.debug_frame)
- .debug_frame     0x000000         0xe4 build/default/production/main.o
- .debug_frame     0x0000e4         0x48 build/default/production/myADC.o
- .debug_frame     0x00012c         0x2e build/default/production/_ext/765096591/myPWM.o
- .debug_frame     0x00015a         0x2e build/default/production/myScheduler.o
- .debug_frame     0x000188         0x50 build/default/production/myUART.o
- .debug_frame     0x0001d8         0x2e build/default/production/parser.o
- .debug_frame     0x000206         0x62 build/default/production/timerFunc.o
+ .debug_frame     0x000000         0xfe build/default/production/main.o
+ .debug_frame     0x0000fe         0x48 build/default/production/myADC.o
+ .debug_frame     0x000146         0x2e build/default/production/_ext/765096591/myPWM.o
+ .debug_frame     0x000174         0x2e build/default/production/myScheduler.o
+ .debug_frame     0x0001a2         0x50 build/default/production/myUART.o
+ .debug_frame     0x0001f2         0x2e build/default/production/parser.o
+ .debug_frame     0x000220         0x62 build/default/production/timerFunc.o
+ .debug_frame     0x000282         0x7c build/default/production/myBuffer.o
 
-.debug_str        0x000000         0xc9
+.debug_str        0x000000         0xfd
  *(.debug_str)
- .debug_str       0x000000         0x19 build/default/production/main.o
- .debug_str       0x000019         0x36 build/default/production/myADC.o
- .debug_str       0x00004f         0x16 build/default/production/_ext/765096591/myPWM.o
- .debug_str       0x000065         0x3c build/default/production/myUART.o
- .debug_str       0x0000a1         0x28 build/default/production/timerFunc.o
+ .debug_str       0x000000         0x44 build/default/production/main.o
+ .debug_str       0x000044         0x36 build/default/production/myADC.o
+ .debug_str       0x00007a         0x16 build/default/production/_ext/765096591/myPWM.o
+ .debug_str       0x000090         0x3c build/default/production/myUART.o
+ .debug_str       0x0000cc         0x28 build/default/production/timerFunc.o
+ .debug_str       0x0000f4          0x9 build/default/production/myBuffer.o
 
 .debug_loc
  *(.debug_loc)
@@ -429,27 +450,29 @@ userdata
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000        0x1fc
+                  0x000000        0x266
  *(.debug_pubnames)
  .debug_pubnames
-                  0x000000         0xe0 build/default/production/main.o
+                  0x000000        0x107 build/default/production/main.o
  .debug_pubnames
-                  0x0000e0         0x37 build/default/production/myADC.o
+                  0x000107         0x37 build/default/production/myADC.o
  .debug_pubnames
-                  0x000117         0x21 build/default/production/_ext/765096591/myPWM.o
+                  0x00013e         0x21 build/default/production/_ext/765096591/myPWM.o
  .debug_pubnames
-                  0x000138         0x20 build/default/production/myScheduler.o
+                  0x00015f         0x20 build/default/production/myScheduler.o
  .debug_pubnames
-                  0x000158         0x38 build/default/production/myUART.o
+                  0x00017f         0x38 build/default/production/myUART.o
  .debug_pubnames
-                  0x000190         0x21 build/default/production/parser.o
+                  0x0001b7         0x21 build/default/production/parser.o
  .debug_pubnames
-                  0x0001b1         0x4b build/default/production/timerFunc.o
+                  0x0001d8         0x4b build/default/production/timerFunc.o
+ .debug_pubnames
+                  0x000223         0x43 build/default/production/myBuffer.o
 
 .debug_ranges
  *(.debug_ranges)
 
-.debug_aranges    0x000000         0xa8
+.debug_aranges    0x000000         0xc0
  *(.debug_aranges)
  .debug_aranges
                   0x000000         0x18 build/default/production/main.o
@@ -465,6 +488,8 @@ userdata
                   0x000078         0x18 build/default/production/parser.o
  .debug_aranges
                   0x000090         0x18 build/default/production/timerFunc.o
+ .debug_aranges
+                  0x0000a8         0x18 build/default/production/myBuffer.o
                     0x0000                  WREG0 = 0x0
                     0x0000                  _WREG0 = 0x0
                     0x0002                  WREG1 = 0x2
@@ -1177,72 +1202,78 @@ LOAD default_isr
 LOAD data_init
 
 .debug_pubtypes
-                  0x0000a8        0x2a1
+                  0x0000c0        0x340
  .debug_pubtypes
-                  0x0000a8         0x21 build/default/production/main.o
+                  0x0000c0         0x71 build/default/production/main.o
  .debug_pubtypes
-                  0x0000c9         0xc2 build/default/production/myADC.o
+                  0x000131         0xc2 build/default/production/myADC.o
  .debug_pubtypes
-                  0x00018b         0x61 build/default/production/_ext/765096591/myPWM.o
+                  0x0001f3         0x61 build/default/production/_ext/765096591/myPWM.o
  .debug_pubtypes
-                  0x0001ec         0x21 build/default/production/myScheduler.o
+                  0x000254         0x21 build/default/production/myScheduler.o
  .debug_pubtypes
-                  0x00020d         0x9f build/default/production/myUART.o
+                  0x000275         0x9f build/default/production/myUART.o
  .debug_pubtypes
-                  0x0002ac         0x23 build/default/production/parser.o
+                  0x000314         0x23 build/default/production/parser.o
  .debug_pubtypes
-                  0x0002cf         0x7a build/default/production/timerFunc.o
+                  0x000337         0x7a build/default/production/timerFunc.o
+ .debug_pubtypes
+                  0x0003b1         0x4f build/default/production/myBuffer.o
 
 __c30_signature
-                  0x000349         0x78
+                  0x000400         0x7e
  __c30_signature
-                  0x000349          0x6 build/default/production/main.o
+                  0x000400          0x6 build/default/production/main.o
  __c30_signature
-                  0x00034f          0x6 build/default/production/myADC.o
+                  0x000406          0x6 build/default/production/myADC.o
  __c30_signature
-                  0x000355          0x6 build/default/production/_ext/765096591/myPWM.o
+                  0x00040c          0x6 build/default/production/_ext/765096591/myPWM.o
  __c30_signature
-                  0x00035b          0x6 build/default/production/myScheduler.o
+                  0x000412          0x6 build/default/production/myScheduler.o
  __c30_signature
-                  0x000361          0x6 build/default/production/myUART.o
+                  0x000418          0x6 build/default/production/myUART.o
  __c30_signature
-                  0x000367          0x6 build/default/production/parser.o
+                  0x00041e          0x6 build/default/production/parser.o
  __c30_signature
-                  0x00036d          0x6 build/default/production/timerFunc.o
+                  0x000424          0x6 build/default/production/timerFunc.o
  __c30_signature
-                  0x000373          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\liblega-pic30-elf.a(crt0_standard.o)
+                  0x00042a          0x6 build/default/production/myBuffer.o
  __c30_signature
-                  0x000379          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\liblega-pic30-elf.a(data_init_standard.o)
+                  0x000430          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\liblega-pic30-elf.a(crt0_standard.o)
  __c30_signature
-                  0x00037f          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(divsf3.eo)
+                  0x000436          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\liblega-pic30-elf.a(data_init_standard.o)
  __c30_signature
-                  0x000385          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(fixunssfsi.eo)
+                  0x00043c          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(divsf3.eo)
  __c30_signature
-                  0x00038b          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(floatsisf.eo)
+                  0x000442          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(fixunssfsi.eo)
  __c30_signature
-                  0x000391          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(fpack.eo)
+                  0x000448          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(floatsisf.eo)
  __c30_signature
-                  0x000397          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(funpack.eo)
+                  0x00044e          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(fpack.eo)
  __c30_signature
-                  0x00039d          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(funpack2.eo)
+                  0x000454          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(funpack.eo)
  __c30_signature
-                  0x0003a3          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(futil.eo)
+                  0x00045a          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(funpack2.eo)
  __c30_signature
-                  0x0003a9          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(mulsf3.eo)
+                  0x000460          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(futil.eo)
  __c30_signature
-                  0x0003af          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(floatdisf.eo)
+                  0x000466          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(mulsf3.eo)
  __c30_signature
-                  0x0003b5          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(floatundisf.eo)
+                  0x00046c          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(floatdisf.eo)
  __c30_signature
-                  0x0003bb          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\liblega-c-elf.a(strlen.XX_eo)
+                  0x000472          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\libm-elf.a(floatundisf.eo)
+ __c30_signature
+                  0x000478          0x6 c:/program files/microchip/xc16/v1.60/bin/bin/../../lib\liblega-c-elf.a(strlen.XX_eo)
 
-.nbss               0x0800          0x6
- .nbss              0x0800          0x6 build/default/production/main.o
+.nbss               0x0800         0x7e
+ .nbss              0x0800         0x7e build/default/production/main.o
                     0x0800                  _lcd_mode
                     0x0802                  _temp_buffer
                     0x0804                  _uC_state
+                    0x0806                  _UARTbuf
+                    0x080e                  _pstate
 
-.text             0x000426        0x464
+.text             0x000426        0x598
  .text            0x000426        0x134 build/default/production/timerFunc.o
                   0x000426                  _tmr_wait_ms
                   0x0004b4                  _tmr_setup_period
@@ -1252,22 +1283,28 @@ __c30_signature
                   0x0005c8                  _adc_config_2_chan
  .text            0x000662         0xf6 build/default/production/parser.o
                   0x000662                  _parse_byte
- .text            0x000758         0x66 build/default/production/myScheduler.o
-                  0x000758                  _scheduler
- .text            0x0007be         0x56 build/default/production/main.o
-                  0x0007be                  _task_PWM_controller
-                  0x0007c6                  _task_temperature_acquisition
-                  0x0007ce                  _task_send_temperature
-                  0x0007d6                  _task_feedback_ack
-                  0x0007de                  _task_LED_blink
-                  0x0007e6                  _task_LCD
-                  0x0007ee                  _task_receiver
-                  0x0007f6                  _main
- .text            0x000814         0x54 build/default/production/myUART.o
-                  0x000814                  _UART_config
-                  0x00083c                  _send_string_UART2
- .text            0x000868         0x22 build/default/production/_ext/765096591/myPWM.o
-                  0x000868                  _PWM_config
+ .text            0x000758         0xce build/default/production/myBuffer.o
+                  0x000758                  _initBuf
+                  0x000774                  _writeBuf
+                  0x0007aa                  _readBuf
+                  0x0007f6                  _sizeBuf
+ .text            0x000826         0xbc build/default/production/main.o
+                  0x000826                  _task_PWM_controller
+                  0x00082e                  _task_temperature_acquisition
+                  0x000836                  _task_send_temperature
+                  0x00083e                  _task_feedback_ack
+                  0x000846                  _task_LED_blink
+                  0x00084e                  _task_LCD
+                  0x000856                  _task_receiver
+                  0x000890                  _msg_handler
+                  0x0008ae                  _main
+ .text            0x0008e2         0x66 build/default/production/myScheduler.o
+                  0x0008e2                  _scheduler
+ .text            0x000948         0x54 build/default/production/myUART.o
+                  0x000948                  _UART_config
+                  0x000970                  _send_string_UART2
+ .text            0x00099c         0x22 build/default/production/_ext/765096591/myPWM.o
+                  0x00099c                  _PWM_config
 
-.dinit            0x00088a          0x8
- .dinit           0x00088a          0x8 data_init
+.dinit            0x0009be          0x8
+ .dinit           0x0009be          0x8 data_init

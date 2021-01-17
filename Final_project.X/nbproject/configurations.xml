@@ -11,6 +11,7 @@
       <itemPath>parser.h</itemPath>
       <itemPath>timerFunc.h</itemPath>
       <itemPath>global_&amp;_define.h</itemPath>
+      <itemPath>myBuffer.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -26,6 +27,7 @@
       <itemPath>myUART.c</itemPath>
       <itemPath>parser.c</itemPath>
       <itemPath>timerFunc.c</itemPath>
+      <itemPath>myBuffer.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -185,7 +187,8 @@
         <property key="warn-section-align" value="false"/>
       </C30-LD>
       <C30Global>
-        <property key="common-include-directories" value=""/>
+        <property key="common-include-directories"
+                  value="C:\Program Files\Microchip\xc16\v1.60\support\dsPIC30F\h"/>
         <property key="dual-boot-partition" value="0"/>
         <property key="fast-math" value="false"/>
         <property key="generic-16-bit" value="false"/>
@@ -205,8 +208,8 @@
         <property key="codecoverage.outputfile" value=""/>
         <property key="oscillator.auxfrequency" value="120"/>
         <property key="oscillator.auxfrequencyunit" value="Mega"/>
-        <property key="oscillator.frequency" value="1"/>
-        <property key="oscillator.frequencyunit" value="Mega"/>
+        <property key="oscillator.frequency" value="1843200"/>
+        <property key="oscillator.frequencyunit" value="None"/>
         <property key="oscillator.rcfrequency" value="250"/>
         <property key="oscillator.rcfrequencyunit" value="Kilo"/>
         <property key="periphADC1.altscl" value="false"/>

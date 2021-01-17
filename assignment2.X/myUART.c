@@ -5,8 +5,12 @@
  * Created on 18 dicembre 2020, 18.41
  */
 
-
+#include <string.h>
+#include <stdio.h>
 #include "myUART.h"
+#include "global_&_define.h"
+#include "myBuffer.h"
+
 
 void UART_config(int port) {
     switch (port){
@@ -32,4 +36,11 @@ void send_string_UART2(char* msg){
     U2TXREG = msg[i];
     }
         
+}
+
+// Put a char in the UART buffer every time there is a new interrupt msg from UART
+void __attribute__((__interrupt__, __auto_psv__)) _U2RXInterrupt () {
+    IFS1bits.U2RXIF = 0;                            // Reset rx interrupt flag
+    int val = U2RXREG;                              // Read from rx register
+    writeBuf(&UARTbuf, val);    // Save value in buffer
 }
