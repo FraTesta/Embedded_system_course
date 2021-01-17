@@ -7,8 +7,9 @@
 
 
 #include "myPWM.h"
+#include "global_&_define.h"
 
-void PWM_config(){
+void PWM_config() {
     // PWM period 20 ms = 50 Hz
     PTCONbits.PTMOD = 1;
     PTCONbits.PTCKPS = 1; // prescaler 1:4
@@ -16,3 +17,6 @@ void PWM_config(){
     PTPER = 9215;
     PTCONbits.PTEN = 1;
 }
+
+
+

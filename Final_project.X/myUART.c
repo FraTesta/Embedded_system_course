@@ -9,7 +9,7 @@
 #include "myUART.h"
 
 void UART_config(int port) {
-    switch (port){
+    switch (port) {
         case 1:
             U2BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
             U2MODEbits.UARTEN = 1; //enable UART module 
@@ -19,17 +19,25 @@ void UART_config(int port) {
             U1BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
             U1MODEbits.UARTEN = 1; //enable UART module 
             U1STAbits.UTXEN = 1; // enable transmission 
-            break;         
+            break;
     }
-    
+
 }
 
 // sand a string through UART2
-void send_string_UART2(char* msg){
 
-    int i; 
-    for (i = 0; i < strlen(msg) +1; i++){
-    U2TXREG = msg[i];
+void send_string_UART2(char* msg) {
+    if (U2STAbits.UTXBF == 0) { // If buffer is not full
+
+        int i;
+        for (i = 0; i < strlen(msg) + 1; i++) {
+            U2TXREG = msg[i];
+        }
     }
-        
+    while (U2STAbits.UTXBF == 1) {
+        } // Wait for space in buffer
+    
+    U2STAbits.OERR = 0; // Reset buffer overrun error
+
 }
+
