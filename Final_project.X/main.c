@@ -45,7 +45,6 @@ void* task_temperature_acquisition(void* params) {
 
 void* task_send_temperature(void* params) {
 }
-
 /* media dei valori di temp
  * send msg MCTEM
  */
@@ -64,6 +63,7 @@ void* task_LCD(void* params) {
 // in base allo stato di S6 stampare un msg o l'altro 
 
 void* task_receiver(void* params) {
+    motorsData* mot_data = (motorsData*) params;
     int bufError;
     int UARTbyte = 0; // byte read from UART
     char tempChar;
@@ -86,26 +86,40 @@ void* task_receiver(void* params) {
 
 }
 
-int msg_handler(char* msg_type, char* msg_payload) {
+int msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
+    int tempRPM1 = 0;
+    int tempRPM2 = 0;
+    
     switch (uC_state) {
         case TIMEOUT_MODE:
-            // set motor to 0
+            // set motor to 0 this is done in the pwm task probably 
             uC_state = CONTROLLED_MODE;
             //msg_handler();
             break;
         case SAFE_MODE:
-            // interrupt di S5 deve stoppare i motori 
-            // if(msg_type == HLENA ){
+            // interrupt di S5 
+            //( IMMIDIATLY motor speed 0, PROB. using interupt )
+            if(strcmp(msg_type, "HLENA") == 0 ){
             uC_state = CONTROLLED_MODE;
-            // motor speed 0
+            // vel mot to 0
             // ack msg
+            }
             break;
         case CONTROLLED_MODE:
-            //msg_handler();
+            if(strcmp(msg_type, "HLREF") == 0){
+                // extract rpms from msg_payload
+                sscanf(msg_payload, %d, %d, &tempRPM1, &tempRPM2);
+                mot_data->leftRPM;
+                mot_data->rightRPM;
+            }
             break;
 
     }
 }
+/*
+int check_RPM_value(int *rpm1, int *rpm2){
+    if (rp1 > )
+}*/
 
 int main(void) {
     //////////////////////////////   Initialization Protocols   /////////////////////////////////////////
