@@ -2,6 +2,9 @@
 #define	XC_HEADER_GLOBAL_H
 
 #include <xc.h>
+#include "myBuffer.h"
+#include "parser.h"
+#include "myScheduler.h"
 // da mettere in un global.h
 #define MAX_PROPELLER 8000
 #define MIN_PROPELLER -8000
@@ -18,7 +21,7 @@
 //buffer 
 #define UART_BUFF_DIM 100
 
-// data 
+// messi tutti gli extern delle global variable per condividerli con altri file.c
 typedef struct{
     int maxRPM;
     int minRPM;
@@ -26,9 +29,7 @@ typedef struct{
     int rightRPM;
 }motorsData;
 
-int lcd_mode;
-float* temp_buffer; 
-int uC_state;
+extern circularBuffer UARTbuf;
 
 
 

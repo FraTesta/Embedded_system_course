@@ -1,3 +1,7 @@
 build/default/production/myUART.o:  \
 myUART.c  \
-myUART.h 
+myUART.h  \
+myBuffer.h  \
+ global_&_define.h  \
+parser.h  \
+myScheduler.h 

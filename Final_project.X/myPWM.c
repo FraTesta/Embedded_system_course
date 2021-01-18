@@ -7,7 +7,6 @@
 
 
 #include "myPWM.h"
-#include "global_&_define.h"
 
 void PWM_config() {
     // PWM period 20 ms = 50 Hz

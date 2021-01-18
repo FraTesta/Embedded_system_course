@@ -1,8 +1,7 @@
-#ifndef UART_H
-#define	UART_H
+#ifndef XC_HEADER_UART_H
+#define	XC_HEADER_UART_H
 
 #include <xc.h> 
-#include <string.h>
 
 void UART_config(int port);
 // sand a string through UART2

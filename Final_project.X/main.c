@@ -24,7 +24,10 @@
 #include "myBuffer.h"
 
 
-
+// microcontroller state 
+int uC_state;
+// lcd mode 
+int lcd_mode;
 // urat buffer
 circularBuffer UARTbuf;
 // Parser state variable
@@ -90,8 +93,8 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
                 sscanf(msg_payload, "%d,%d", &tempMINrpm, &tempMAXrpm);
                 if (!checkRange(tempMINrpm, tempMAXrpm, mot_data)) {
                     // positive ack
-                    send_string_UART2("MCACK,REF,1"); 
-                     // Restart timer since a new reference arrived
+                    send_string_UART2("MCACK,REF,1");
+                    // Restart timer since a new reference arrived
                 }
                 // negative ack
                 send_string_UART2("MCACK,REF,0");
@@ -144,7 +147,7 @@ void* task_receiver(void* params) {
     char tempChar; // contains a char read from the UART buffer 
     int bufError;
     int parseFlag;
-    int ack;
+    
     // check if there is some unread data in the UART buffer
     // notice that this buffer is automatically 
     while (sizeBuf(&UARTbuf) > 0) {
@@ -153,8 +156,8 @@ void* task_receiver(void* params) {
         parseFlag = parse_byte(&pstate, tempChar); // Parse each byte 
 
         if (parseFlag == NEW_MESSAGE) {
-            ack = msg_handler(pstate.msg_type, pstate.msg_payload, mot_data); // Get type of message
-            send_string_UART2(ack)
+            msg_handler(pstate.msg_type, pstate.msg_payload, mot_data); // Get type of message
+            //send_string_UART2(ack);
         }
     }
     //check UART
