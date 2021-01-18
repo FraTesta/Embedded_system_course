@@ -61,7 +61,7 @@ void __attribute__((__interrupt__, __auto_psv__)) _INT2Interrupt() //interrupt s
     T2CONbits.TON = 0; // stop the timer T2
     IFS0bits.T2IF = 0; // put down the flag interrupt timer2
 
-    IEC1bits.INT1IE = 0; // put down the flag of INT0 (perchè anche se disabilito l'interupt il flag può cambiare il suo stato)
+    IEC1bits.INT1IE = 0; // put down the flag of INT0 (perchè anche se disabilito l'interupt, il flag può cambiare il suo stato)
     IEC1bits.INT1IE = 1; // and finnaly I anable it 
 }
 

@@ -22,6 +22,7 @@
 #include "myPWM.h"
 #include "global_&_define.h"  // file.h which contains all global variables 
 #include "myBuffer.h"
+#include "buttons.h"
 
 
 // microcontroller state 
@@ -71,8 +72,13 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
     switch (uC_state) {
         case TIMEOUT_MODE:
             // set motor to 0 this is done in the pwm task probably 
-            //uC_state = CONTROLLED_MODE;
-            //msg_handler();
+            mot_data->leftRPM = 0;
+            mot_data->rightRPM = 0;
+            if (strcmp(msg_type, "HLREF") == 0) {
+                uC_state = CONTROLLED_MODE;
+                // recursive call 
+                msg_handler(msg_type, msg_payload, mot_data);
+            }
             break;
         case SAFE_MODE:
             // interrupt di S5 
@@ -99,7 +105,10 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
                 if (prevSafe == 1) {
                     send_string_UART2("MCACK,ENA,1");
                     prevSafe = 0;
+                    setButton();
                 }
+
+                restart_TIMEOUT_timer();
             }
             if (strcmp(msg_type, "HLSAT") == 0) {
                 // extract min and max RPMs allowed 
@@ -107,12 +116,10 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
                 if (!checkRange(tempMINrpm, tempMAXrpm, mot_data)) {
                     // positive ack
                     send_string_UART2("MCACK,SAT,1");
-                    // Restart timer since a new reference arrived
                 }
                 // negative ack
                 send_string_UART2("MCACK,SAT,0");
-                // Enable timer 2 interrupts for timeout mode and restart timer
-                // Re-enable buttons interrupts for safe mode
+
             }
             break;
 
@@ -188,6 +195,8 @@ int main(void) {
     PWM_config();
     // UART init
     UART_config(2); // PROBABILMENTE DA CAMBIARE 
+
+
     //////////////////////////////   Initialization Data   ///////////////////////////////////////////////
     // LED init 
     TRISBbits.TRISB0 = 0; // D3
@@ -204,6 +213,10 @@ int main(void) {
     lcd_mode = LCD1;
     // init microcontroller mode 
     uC_state = CONTROLLED_MODE;
+
+    // Init timer for TIMEOUT mode
+    tmr_setup_period(TIMER3, 5000);
+    IFS0bits.T3IF = 1; // enable timer 3 interrupt 
 
     return 0;
 }
