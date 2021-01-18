@@ -83,7 +83,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _INT0Interrupt() //interrupt se
      solution:
      *  tmr_setup_period(TIMER2,50);  // I want to stop the INT0 interrupt for 50 ms
      *  IECObits.INT0IE = 0;  // disable interrutp INT0
-     *  IECObits.T2IE = 0;  // anable the timer2 interrupt 
+     *  IECObits.T2IE = 1;  // anable the timer2 interrupt 
      *  
      * THEN I have to create a routine for the interrupt of the timer 2
      * 

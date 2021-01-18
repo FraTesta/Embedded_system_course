@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c myADC.c myScheduler.c myUART.c parser.c timerFunc.c myBuffer.c myPWM.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c myADC.c myScheduler.c myUART.c parser.c timerFunc.c myBuffer.c myPWM.c buttons.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/myADC.o ${OBJECTDIR}/myScheduler.o ${OBJECTDIR}/myUART.o ${OBJECTDIR}/parser.o ${OBJECTDIR}/timerFunc.o ${OBJECTDIR}/myBuffer.o ${OBJECTDIR}/myPWM.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/myADC.o.d ${OBJECTDIR}/myScheduler.o.d ${OBJECTDIR}/myUART.o.d ${OBJECTDIR}/parser.o.d ${OBJECTDIR}/timerFunc.o.d ${OBJECTDIR}/myBuffer.o.d ${OBJECTDIR}/myPWM.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/myADC.o ${OBJECTDIR}/myScheduler.o ${OBJECTDIR}/myUART.o ${OBJECTDIR}/parser.o ${OBJECTDIR}/timerFunc.o ${OBJECTDIR}/myBuffer.o ${OBJECTDIR}/myPWM.o ${OBJECTDIR}/buttons.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/myADC.o.d ${OBJECTDIR}/myScheduler.o.d ${OBJECTDIR}/myUART.o.d ${OBJECTDIR}/parser.o.d ${OBJECTDIR}/timerFunc.o.d ${OBJECTDIR}/myBuffer.o.d ${OBJECTDIR}/myPWM.o.d ${OBJECTDIR}/buttons.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/myADC.o ${OBJECTDIR}/myScheduler.o ${OBJECTDIR}/myUART.o ${OBJECTDIR}/parser.o ${OBJECTDIR}/timerFunc.o ${OBJECTDIR}/myBuffer.o ${OBJECTDIR}/myPWM.o
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/myADC.o ${OBJECTDIR}/myScheduler.o ${OBJECTDIR}/myUART.o ${OBJECTDIR}/parser.o ${OBJECTDIR}/timerFunc.o ${OBJECTDIR}/myBuffer.o ${OBJECTDIR}/myPWM.o ${OBJECTDIR}/buttons.o
 
 # Source Files
-SOURCEFILES=main.c myADC.c myScheduler.c myUART.c parser.c timerFunc.c myBuffer.c myPWM.c
+SOURCEFILES=main.c myADC.c myScheduler.c myUART.c parser.c timerFunc.c myBuffer.c myPWM.c buttons.c
 
 
 
@@ -151,6 +151,13 @@ ${OBJECTDIR}/myPWM.o: myPWM.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  myPWM.c  -o ${OBJECTDIR}/myPWM.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/myPWM.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1    -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -I"C:/Program Files/Microchip/xc16/v1.60/support/dsPIC30F/h" -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp=${DFP_DIR}/xc16
 	@${FIXDEPS} "${OBJECTDIR}/myPWM.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/buttons.o: buttons.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/buttons.o.d 
+	@${RM} ${OBJECTDIR}/buttons.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  buttons.c  -o ${OBJECTDIR}/buttons.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/buttons.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1    -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -I"C:/Program Files/Microchip/xc16/v1.60/support/dsPIC30F/h" -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp=${DFP_DIR}/xc16
+	@${FIXDEPS} "${OBJECTDIR}/buttons.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 else
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -207,6 +214,13 @@ ${OBJECTDIR}/myPWM.o: myPWM.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/myPWM.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  myPWM.c  -o ${OBJECTDIR}/myPWM.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/myPWM.o.d"        -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -I"C:/Program Files/Microchip/xc16/v1.60/support/dsPIC30F/h" -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp=${DFP_DIR}/xc16
 	@${FIXDEPS} "${OBJECTDIR}/myPWM.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/buttons.o: buttons.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/buttons.o.d 
+	@${RM} ${OBJECTDIR}/buttons.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  buttons.c  -o ${OBJECTDIR}/buttons.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/buttons.o.d"        -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -I"C:/Program Files/Microchip/xc16/v1.60/support/dsPIC30F/h" -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp=${DFP_DIR}/xc16
+	@${FIXDEPS} "${OBJECTDIR}/buttons.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 

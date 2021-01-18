@@ -12,6 +12,7 @@
       <itemPath>global_&amp;_define.h</itemPath>
       <itemPath>myBuffer.h</itemPath>
       <itemPath>myPWM.h</itemPath>
+      <itemPath>buttons.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -28,6 +29,7 @@
       <itemPath>timerFunc.c</itemPath>
       <itemPath>myBuffer.c</itemPath>
       <itemPath>myPWM.c</itemPath>
+      <itemPath>buttons.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

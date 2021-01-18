@@ -34,6 +34,7 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 
 void PWM_config();
+void sendRPM(int rpm1, int rpm2);
 
 #endif	/* XC_HEADER_MY_PWM_H */
 

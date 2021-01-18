@@ -28,10 +28,16 @@
 int uC_state;
 // lcd mode 
 int lcd_mode;
+// flag for button S6
+int S6status;
 // urat buffer
 circularBuffer UARTbuf;
+// motors data struct 
+motorsData motor_data;
 // Parser state variable
 parser_state pstate;
+// safe mode flag (per mandare l'ack quando un msg è arrivato )
+int prevSafe = 0;
 
 ///////////////////////////////////////////////////// FUNCTIONS //////////////////////////////////////////////////
 
@@ -65,16 +71,18 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
     switch (uC_state) {
         case TIMEOUT_MODE:
             // set motor to 0 this is done in the pwm task probably 
-            uC_state = CONTROLLED_MODE;
+            //uC_state = CONTROLLED_MODE;
             //msg_handler();
             break;
         case SAFE_MODE:
             // interrupt di S5 
-            //( IMMIDIATLY motor speed 0, PROB. using interupt )
+            send_string_UART2("MCACK,ENA,0"); // no enable msg sent 
             if (strcmp(msg_type, "HLENA") == 0) {
+                // set motors to 0
+                mot_data->leftRPM = 0;
+                mot_data->rightRPM = 0;
                 uC_state = CONTROLLED_MODE;
-                // vel mot to 0
-                // ack msg
+                prevSafe = 1;
             }
             break;
         case CONTROLLED_MODE:
@@ -87,17 +95,24 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
 
                 mot_data->leftRPM = tempRPM1;
                 mot_data->rightRPM = tempRPM2;
+                // check if we are after a safe mode
+                if (prevSafe == 1) {
+                    send_string_UART2("MCACK,ENA,1");
+                    prevSafe = 0;
+                }
             }
             if (strcmp(msg_type, "HLSAT") == 0) {
                 // extract min and max RPMs allowed 
                 sscanf(msg_payload, "%d,%d", &tempMINrpm, &tempMAXrpm);
                 if (!checkRange(tempMINrpm, tempMAXrpm, mot_data)) {
                     // positive ack
-                    send_string_UART2("MCACK,REF,1");
+                    send_string_UART2("MCACK,SAT,1");
                     // Restart timer since a new reference arrived
                 }
                 // negative ack
-                send_string_UART2("MCACK,REF,0");
+                send_string_UART2("MCACK,SAT,0");
+                // Enable timer 2 interrupts for timeout mode and restart timer
+                // Re-enable buttons interrupts for safe mode
             }
             break;
 
@@ -147,7 +162,7 @@ void* task_receiver(void* params) {
     char tempChar; // contains a char read from the UART buffer 
     int bufError;
     int parseFlag;
-    
+
     // check if there is some unread data in the UART buffer
     // notice that this buffer is automatically 
     while (sizeBuf(&UARTbuf) > 0) {
@@ -166,19 +181,19 @@ void* task_receiver(void* params) {
 }
 
 int main(void) {
-    //////////////////////////////   Initialization Protocols   /////////////////////////////////////////
+    //////////////////////////////   Peripherals   /////////////////////////////////////////
     // ADC init
-    adc_config_2_chan(AN2, AN3); // to configure two channel of the adc 
+    adc_config(AN3); // to configure two channel of the adc 
     // PWM init 
     PWM_config();
     // UART init
-    UART_config(2);
+    UART_config(2); // PROBABILMENTE DA CAMBIARE 
     //////////////////////////////   Initialization Data   ///////////////////////////////////////////////
     // LED init 
     TRISBbits.TRISB0 = 0; // D3
     TRISBbits.TRISB1 = 0; // D4
     // motor data init
-    motorsData motor_data;
+
     motor_data.leftRPM = 0;
     motor_data.rightRPM = 0;
     motor_data.maxRPM = MAX_PROPELLER;

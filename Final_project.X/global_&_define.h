@@ -21,6 +21,9 @@
 //buffer 
 #define UART_BUFF_DIM 100
 
+#define FCY 1843200
+#define F_PWM 1000
+
 // messi tutti gli extern delle global variable per condividerli con altri file.c
 typedef struct{
     int maxRPM;
@@ -29,7 +32,10 @@ typedef struct{
     int rightRPM;
 }motorsData;
 
+extern int uC_state;
+extern int S6status;
 extern circularBuffer UARTbuf;
+extern motorsData motor_data;
 
 
 
