@@ -46,6 +46,7 @@ typedef struct{
 void initBuf(circularBuffer *buf, int dim);
 void writeBuf(circularBuffer *buf, int data);
 int readBuf(circularBuffer *buf, int *data);
-int sizeBuf(circularBuffer *buf);
+// tell us whether there are new data in the buffer 
+int dataToRead(circularBuffer *buf);
 
 #endif	/* XC_HEADER_MY_BUFFER_H */

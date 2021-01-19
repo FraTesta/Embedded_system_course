@@ -34,6 +34,23 @@ void sendRPM(int rpm1, int rpm2){
     PDC2 = 2 * PTPER*dutyCycle1;
     PDC3 = 2 * PTPER*dutyCycle2;
 }
-
+// check whether the sent rpm vaue is outside of the rpm allowed, in such case the system saturate those values to the max/min allowed. 
+int check_RPM_value(int rpm, motorsData *mot_data) {
+    if (rpm > mot_data->maxRPM) {
+        rpm = mot_data->maxRPM;
+    } else if (rpm < mot_data->minRPM) {
+        rpm = mot_data->minRPM;
+    }
+    return rpm;
+}
+// set new 
+int checkRange(int min, int max, motorsData* mot_data) {
+    if (max > min && max < MIN_PROPELLER && min > MIN_PROPELLER && max >= 0 && min <= 0) {
+        mot_data->minRPM = min;
+        mot_data->maxRPM = max;
+        return 0;
+    }
+    return -1; // send negative ack 
+}
 
 

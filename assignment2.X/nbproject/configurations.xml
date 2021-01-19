@@ -25,7 +25,6 @@
       <itemPath>parser.c</itemPath>
       <itemPath>myUART.c</itemPath>
       <itemPath>myPWM.c</itemPath>
-      <itemPath>../../Desktop/Embedded/parser/buttons.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

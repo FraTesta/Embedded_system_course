@@ -38,7 +38,8 @@ int readBuf(circularBuffer *buf, int *data) {
     return 1;
 }
 
-int sizeBuf(circularBuffer *buf) {
+// tell us whether there are new data in the buffer 
+int dataToRead(circularBuffer *buf) {
     // the size is the number of cells in the CIRCULAR buffer which have still to be read.
     if (buf->writeIndex >= buf->readIndex) {
         return (buf->writeIndex - buf->readIndex);

@@ -13,6 +13,7 @@ void choose_prescaler(int ms, int *pr, int* tckps);
 void tmr_wait_ms(int timer,int ms);
 void tmr_setup_period(int timer , int ms);
 void tmr_wait_period(int timer);
+void restart_TIMEOUT_timer();
 
 #endif /* __cplusplus */
 

@@ -12,19 +12,22 @@
 #include "myBuffer.h"
 #include "global_&_define.h"
 
-
 void UART_config(int port) {
     switch (port) {
-        case 1:
-            U2BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
-            U2MODEbits.UARTEN = 1; //enable UART module 
-            U2STAbits.UTXEN = 1; // enable transmission 
-            break;
-        case 2:
+        case UART1:
             U1BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
             U1MODEbits.UARTEN = 1; //enable UART module 
             U1STAbits.UTXEN = 1; // enable transmission 
+            
             break;
+        case UART2:
+            U2BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
+            U2MODEbits.UARTEN = 1; //enable UART module 
+            U2STAbits.UTXEN = 1; // enable transmission 
+            
+            IEC1bits.U2RXIE = 1;        // Enable rx interrupt for UART
+            break;
+
     }
 
 }
@@ -40,15 +43,15 @@ void send_string_UART2(char* msg) {
         }
     }
     while (U2STAbits.UTXBF == 1) {
-        } // Wait for space in buffer
-    
+    } // Wait for space in buffer
+
     U2STAbits.OERR = 0; // Reset buffer overrun error
 
 }
 
-void __attribute__((__interrupt__, __auto_psv__)) _U2RXInterrupt () {
-    IFS1bits.U2RXIF = 0;                            // Reset rx interrupt flag
-    int val = U2RXREG;                              // Read from rx register
-    writeBuf(&UARTbuf, val);    // Save value in buffer
+void __attribute__((__interrupt__, __auto_psv__)) _U2RXInterrupt() {
+    IFS1bits.U2RXIF = 0; // Reset rx interrupt flag
+    int val = U2RXREG; // Read from rx register
+    writeBuf(&UARTbuf, val); // Save value in buffer
 }
 

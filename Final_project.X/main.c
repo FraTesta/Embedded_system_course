@@ -42,25 +42,6 @@ int prevSafe = 0;
 
 ///////////////////////////////////////////////////// FUNCTIONS //////////////////////////////////////////////////
 
-// check whether the sent rpm vaue is outside of the rpm allowed, in such case the system saturate those values to the max/min allowed. 
-
-int check_RPM_value(int rpm, motorsData *mot_data) {
-    if (rpm > mot_data->maxRPM) {
-        rpm = mot_data->maxRPM;
-    } else if (rpm < mot_data->minRPM) {
-        rpm = mot_data->minRPM;
-    }
-    return rpm;
-}
-
-int checkRange(int min, int max, motorsData* mot_data) {
-    if (max > min && max < MIN_PROPELLER && min > MIN_PROPELLER && max >= 0 && min <= 0) {
-        mot_data->minRPM = min;
-        mot_data->maxRPM = max;
-        return 0;
-    }
-    return -1; // send negative ack 
-}
 
 void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
     // temporary local variables
@@ -105,7 +86,7 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
                 if (prevSafe == 1) {
                     send_string_UART2("MCACK,ENA,1");
                     prevSafe = 0;
-                    setButton();
+                    resetButtonS5();
                 }
 
                 restart_TIMEOUT_timer();
@@ -151,6 +132,7 @@ void* task_send_temperature(void* params) {
  */
 
 void* task_feedback_ack(void* params) {
+    
 }
 // send MCFBK msg
 
@@ -172,7 +154,7 @@ void* task_receiver(void* params) {
 
     // check if there is some unread data in the UART buffer
     // notice that this buffer is automatically 
-    while (sizeBuf(&UARTbuf) > 0) {
+    while (dataToRead(&UARTbuf) > 0) {
         bufError = readBuf(&UARTbuf, &UARTbyte); // Read msg from the UART buffer 
         tempChar = UARTbyte; // Convert int into corresponding char ascii code
         parseFlag = parse_byte(&pstate, tempChar); // Parse each byte 
