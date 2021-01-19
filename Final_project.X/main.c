@@ -24,7 +24,8 @@
 #include "myBuffer.h"
 #include "buttons.h"
 
-
+// The following are variables necessarily global since they are also used in some interrupt handler functions,
+//and in other project files:
 // microcontroller state 
 int uC_state;
 // lcd mode 
@@ -33,6 +34,8 @@ int lcd_mode;
 int S6status;
 // urat buffer
 circularBuffer UARTbuf;
+// temperature buffer 
+temperatureBuffer tempBuf;
 // motors data struct 
 motorsData motor_data;
 // Parser state variable
@@ -41,7 +44,6 @@ parser_state pstate;
 int prevSafe = 0;
 
 ///////////////////////////////////////////////////// FUNCTIONS //////////////////////////////////////////////////
-
 
 void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
     // temporary local variables
@@ -55,9 +57,10 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
             // set motor to 0 this is done in the pwm task probably 
             mot_data->leftRPM = 0;
             mot_data->rightRPM = 0;
+            // mandare msg PWM ? o aspettare il prossimo refrash
             if (strcmp(msg_type, "HLREF") == 0) {
                 uC_state = CONTROLLED_MODE;
-                // recursive call 
+                // recursive call ?
                 msg_handler(msg_type, msg_payload, mot_data);
             }
             break;
@@ -73,6 +76,7 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
             }
             break;
         case CONTROLLED_MODE:
+            // New reference msg
             if (strcmp(msg_type, "HLREF") == 0) {
                 // extract rpms from msg_payload
                 sscanf(msg_payload, "%d,%d", &tempRPM1, &tempRPM2);
@@ -91,6 +95,7 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
 
                 restart_TIMEOUT_timer();
             }
+            // New Max , Min rpm 
             if (strcmp(msg_type, "HLSAT") == 0) {
                 // extract min and max RPMs allowed 
                 sscanf(msg_payload, "%d,%d", &tempMINrpm, &tempMAXrpm);
@@ -121,10 +126,33 @@ void* task_PWM_controller(void* params) {
  */
 
 void* task_temperature_acquisition(void* params) {
+    while (ADCON1bits.DONE == 0);
+    ADCON1bits.DONE = 0;
+
+    int tempBits = ADCBUF1;
+    float tempVolts = tempBits * 5.0 / 1024.0; // bits to Volt
+    float temperature = (tempVolts - 0.75) * 100.0 + 25; // Volt to Deg
+    writeTempBuf(&tempBuf, temperature); //Write values on temperature buffer
+    return 0;
 }
 // acquisizione dati temperatura (quindi ADC ....) 
 
 void* task_send_temperature(void* params) {
+     temperatureBuffer* tempBuf = (temperatureBuffer*) params;
+    int i;
+    float averageTemp = 0.0;
+    // Calculate the average among read values 
+    for (i = 0; i <= TEMP_BUFF_DIM; i++) {
+        averageTemp = averageTemp + tempBuf->indexTemp[i];
+    }
+    averageTemp = averageTemp / TEMP_BUFF_DIM;
+    // Send temperature to pc with MCTEM message [1 Hz]
+    char msgTemp[20];
+    // prepare the msg to be sent via UART
+    sprintf(msgTemp, "$MCTEM,%1.1f*", averageTemp);
+    // send the msg through UART
+    send_string_UART2(msgTemp);
+    return NULL;
 }
 
 /* media dei valori di temp
@@ -132,16 +160,30 @@ void* task_send_temperature(void* params) {
  */
 
 void* task_feedback_ack(void* params) {
-    
+    char msg[50];
+    // prepare msg
+    sprintf(msg, "MCFBK,%d,%d,%d", motor_data.leftRPM, motor_data.rightRPM, uC_state);
+    //send to 
+    send_string_UART2(msg);
 }
 // send MCFBK msg
 
 void* task_LED_blink(void* params) {
+    // Blink led D3
+    LATBbits.LATB0 = !LATBbits.LATB0; // turn the Led D3 on and off
+
+    if (uC_state == TIMEOUT_MODE) // If board is in timeout state
+    { // Blink led D4
+        LATBbits.LATB1 = !LATBbits.LATB1;
+    } else // If board is NOT in timeout state
+        LATBbits.LATB1 = 0; // Switch off led D4 
+    //return 0;
 }
 // blink led D3
 // and D4 iff we are in safe mode
 
 void* task_LCD(void* params) {
+    
 }
 // in base allo stato di S6 stampare un msg o l'altro 
 
@@ -190,7 +232,7 @@ int main(void) {
     motor_data.maxRPM = MAX_PROPELLER;
     motor_data.minRPM = MIN_PROPELLER;
 
-    initBuf(&UARTbuf, UART_BUFF_DIM);
+    initBuf(&UARTbuf, &tempBuf, UART_BUFF_DIM);
     // init LCD mode
     lcd_mode = LCD1;
     // init microcontroller mode 

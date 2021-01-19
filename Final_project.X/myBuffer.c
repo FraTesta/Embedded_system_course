@@ -9,10 +9,21 @@
 #include "xc.h"
 #include "myBuffer.h"
 
-void initBuf(circularBuffer *buf, int dim) {
-    buf->dim = dim;
+void initBuf(circularBuffer *buf, temperatureBuffer *tempBuf,  int dimCircBuff) {
+    // temperature
+    tempBuf-> writeTempIndex = 0;
+    //circular buffer
+    buf->dim = dimCircBuff;
     buf->readIndex = 0;
     buf->writeIndex = 0;
+}
+
+void writeTempBuf(temperatureBuffer *tempBuf, float floatData) {
+    tempBuf->indexTemp[tempBuf->writeTempIndex] = floatData;
+    tempBuf->writeTempIndex++;
+    if (tempBuf->writeTempIndex == TEMP_BUFF_DIM) {
+        tempBuf->writeTempIndex = 0; // restart to write from the first cell
+    }
 }
 
 void writeBuf(circularBuffer *buf, int data) {
