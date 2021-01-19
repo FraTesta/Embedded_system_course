@@ -37,8 +37,8 @@
 void PWM_config();
 void sendRPM(int rpm1, int rpm2);
 // check whether the sent rpm vaue is outside of the rpm allowed, in such case the system saturate those values to the max/min allowed. 
-int check_RPM_value(int rpm, motorsData *mot_data);
-int checkRange(int min, int max, motorsData* mot_data);
+int check_RPM_value(int rpm);
+int checkRange(int min, int max);
 
 #endif	/* XC_HEADER_MY_PWM_H */
 

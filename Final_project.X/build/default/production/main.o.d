@@ -8,4 +8,5 @@ myUART.h  \
 myPWM.h  \
 global_&_define.h  \
 myBuffer.h  \
-buttons.h 
+mySPI_LCD.h  \
+ buttons.h 

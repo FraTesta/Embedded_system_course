@@ -16,9 +16,10 @@
 #define TIMEOUT_MODE 1
 #define SAFE_MODE 2
 
-#define LCD1 1
-#define LCD2_S6 2
-//buffer 
+// buttons
+#define S6_NOT_PRESSED 0 // S6 not pressed
+#define S6_PRESSED 1 // S6 pressed 
+// buffer 
 #define UART_BUFF_DIM 100
 #define TEMP_BUFF_DIM 10
 

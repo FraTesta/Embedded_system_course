@@ -13,6 +13,7 @@
       <itemPath>myBuffer.h</itemPath>
       <itemPath>myPWM.h</itemPath>
       <itemPath>buttons.h</itemPath>
+      <itemPath>mySPI_LCD.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -30,6 +31,7 @@
       <itemPath>myBuffer.c</itemPath>
       <itemPath>myPWM.c</itemPath>
       <itemPath>buttons.c</itemPath>
+      <itemPath>mySPI_LCD.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

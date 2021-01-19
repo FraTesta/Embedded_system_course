@@ -20,6 +20,7 @@
 #include "myScheduler.h"
 #include "myUART.h"
 #include "myPWM.h"
+#include "mySPI_LCD.h"
 #include "global_&_define.h"  // file.h which contains all global variables 
 #include "myBuffer.h"
 #include "buttons.h"
@@ -28,14 +29,11 @@
 //and in other project files:
 // microcontroller state 
 int uC_state;
-// lcd mode 
-int lcd_mode;
 // flag for button S6
 int S6status;
 // urat buffer
 circularBuffer UARTbuf;
-// temperature buffer 
-temperatureBuffer tempBuf;
+
 // motors data struct 
 motorsData motor_data;
 // Parser state variable
@@ -45,7 +43,7 @@ int prevSafe = 0;
 
 ///////////////////////////////////////////////////// FUNCTIONS //////////////////////////////////////////////////
 
-void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
+void msg_handler(char* msg_type, char* msg_payload) {
     // temporary local variables
     int tempRPM1 = 0;
     int tempRPM2 = 0;
@@ -55,13 +53,13 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
     switch (uC_state) {
         case TIMEOUT_MODE:
             // set motor to 0 this is done in the pwm task probably 
-            mot_data->leftRPM = 0;
-            mot_data->rightRPM = 0;
+            motor_data.leftRPM = 0;
+            motor_data.rightRPM = 0;
             // mandare msg PWM ? o aspettare il prossimo refrash
             if (strcmp(msg_type, "HLREF") == 0) {
                 uC_state = CONTROLLED_MODE;
                 // recursive call ?
-                msg_handler(msg_type, msg_payload, mot_data);
+                msg_handler(msg_type, msg_payload);
             }
             break;
         case SAFE_MODE:
@@ -69,10 +67,11 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
             send_string_UART2("MCACK,ENA,0"); // no enable msg sent 
             if (strcmp(msg_type, "HLENA") == 0) {
                 // set motors to 0
-                mot_data->leftRPM = 0;
-                mot_data->rightRPM = 0;
+                motor_data.leftRPM = 0;
+                motor_data.rightRPM = 0;
                 uC_state = CONTROLLED_MODE;
-                prevSafe = 1;
+                send_string_UART2("MCACK,ENA,1");
+                resetButtonS5();
             }
             break;
         case CONTROLLED_MODE:
@@ -81,17 +80,12 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
                 // extract rpms from msg_payload
                 sscanf(msg_payload, "%d,%d", &tempRPM1, &tempRPM2);
 
-                tempRPM1 = check_RPM_value(tempRPM1, mot_data);
-                tempRPM2 = check_RPM_value(tempRPM2, mot_data);
+                tempRPM1 = check_RPM_value(tempRPM1);
+                tempRPM2 = check_RPM_value(tempRPM2);
 
-                mot_data->leftRPM = tempRPM1;
-                mot_data->rightRPM = tempRPM2;
-                // check if we are after a safe mode
-                if (prevSafe == 1) {
-                    send_string_UART2("MCACK,ENA,1");
-                    prevSafe = 0;
-                    resetButtonS5();
-                }
+                motor_data.leftRPM = tempRPM1;
+                motor_data.rightRPM = tempRPM2;
+
 
                 restart_TIMEOUT_timer();
             }
@@ -99,7 +93,7 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
             if (strcmp(msg_type, "HLSAT") == 0) {
                 // extract min and max RPMs allowed 
                 sscanf(msg_payload, "%d,%d", &tempMINrpm, &tempMAXrpm);
-                if (!checkRange(tempMINrpm, tempMAXrpm, mot_data)) {
+                if (!checkRange(tempMINrpm, tempMAXrpm)) {
                     // positive ack
                     send_string_UART2("MCACK,SAT,1");
                 }
@@ -114,10 +108,10 @@ void msg_handler(char* msg_type, char* msg_payload, motorsData* mot_data) {
 
 
 
-
 ///////////////////////////////////////////////// TASKS ///////////////////////////////////////////////////
 
 void* task_PWM_controller(void* params) {
+
 }
 
 /*
@@ -126,6 +120,7 @@ void* task_PWM_controller(void* params) {
  */
 
 void* task_temperature_acquisition(void* params) {
+    temperatureBuffer* tempBuf = (temperatureBuffer*) params;
     while (ADCON1bits.DONE == 0);
     ADCON1bits.DONE = 0;
 
@@ -138,18 +133,18 @@ void* task_temperature_acquisition(void* params) {
 // acquisizione dati temperatura (quindi ADC ....) 
 
 void* task_send_temperature(void* params) {
-     temperatureBuffer* tempBuf = (temperatureBuffer*) params;
+    temperatureBuffer* tempBuf = (temperatureBuffer*) params;
     int i;
-    float averageTemp = 0.0;
+    double averageTemp = 0.0;
     // Calculate the average among read values 
     for (i = 0; i <= TEMP_BUFF_DIM; i++) {
         averageTemp = averageTemp + tempBuf->indexTemp[i];
     }
-    averageTemp = averageTemp / TEMP_BUFF_DIM;
+    tempBuf->averageTemp = tempBuf->averageTemp / TEMP_BUFF_DIM;
     // Send temperature to pc with MCTEM message [1 Hz]
     char msgTemp[20];
     // prepare the msg to be sent via UART
-    sprintf(msgTemp, "$MCTEM,%1.1f*", averageTemp);
+    sprintf(msgTemp, "$MCTEM,%.2f*", tempBuf->averageTemp);
     // send the msg through UART
     send_string_UART2(msgTemp);
     return NULL;
@@ -183,12 +178,49 @@ void* task_LED_blink(void* params) {
 // and D4 iff we are in safe mode
 
 void* task_LCD(void* params) {
-    
+    temperatureBuffer* tempBuf = (temperatureBuffer*) params;
+    char tempStr[5];
+    char rpmStr[14];
+    if (S6status == S6_NOT_PRESSED) {
+        spi_clean_LCD();
+
+        // first row
+        setTags1();
+        switch (uC_state) {
+
+            case TIMEOUT_MODE:
+                spi_put_string("T", FIRST_ROW + 0x04);
+                break;
+            case SAFE_MODE:
+                spi_put_string("H", FIRST_ROW + 0x04);
+                break;
+            case CONTROLLED_MODE:
+                spi_put_string("C", FIRST_ROW + 0x04);
+                break;
+        }
+        sprintf(tempStr, "%.2f", tempBuf->averageTemp);
+        spi_put_string(tempStr, TEMP_LCD_POSIT + 0x03);
+        // second row    
+        sprintf(rpmStr, "%d; %d", motor_data.leftRPM, motor_data.rightRPM);
+        spi_put_string(rpmStr, SECOND_ROW + 0x03);
+    } else {
+        spi_clean_LCD();
+        setTags2();
+        // first row msg
+        // the minimum and maximum current saturation values set
+        sprintf(rpmStr, "%d ,%d", motor_data.minRPM, motor_data.maxRPM);
+        spi_put_string(rpmStr, FIRST_ROW + 0x04);
+        //second row msg
+        //the values of the duty cycle PWM registers
+        sprintf(rpmStr, "%.2f ,%.2f", PDC2 / (2 * PTPER), PDC3 / (2 * PTPER));
+        spi_put_string(rpmStr, SECOND_ROW + 0x03);
+
+    }
 }
 // in base allo stato di S6 stampare un msg o l'altro 
 
 void* task_receiver(void* params) {
-    motorsData* mot_data = (motorsData*) params;
+    parser_state* pstate = (parser_state*) params;
     int UARTbyte = 0; // byte read from UART
     char tempChar; // contains a char read from the UART buffer 
     int bufError;
@@ -202,7 +234,7 @@ void* task_receiver(void* params) {
         parseFlag = parse_byte(&pstate, tempChar); // Parse each byte 
 
         if (parseFlag == NEW_MESSAGE) {
-            msg_handler(pstate.msg_type, pstate.msg_payload, mot_data); // Get type of message
+            msg_handler(pstate->msg_type, pstate->msg_payload); // Get type of message
             //send_string_UART2(ack);
         }
     }
@@ -232,9 +264,12 @@ int main(void) {
     motor_data.maxRPM = MAX_PROPELLER;
     motor_data.minRPM = MIN_PROPELLER;
 
+    // temperature buffer 
+    temperatureBuffer tempBuf;
+
     initBuf(&UARTbuf, &tempBuf, UART_BUFF_DIM);
     // init LCD mode
-    lcd_mode = LCD1;
+    S6status = S6_NOT_PRESSED;
     // init microcontroller mode 
     uC_state = CONTROLLED_MODE;
 

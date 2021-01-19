@@ -29,7 +29,6 @@ void resetButtonS5() {
 
 // S5 button ISR
 // non importa del bouncing tanto attiva solo un flag (non cambia lo stato precedente come in S6)
-
 void __attribute__((__interrupt__, __auto_psv__)) _INT0Interrupt() {
     IFS0bits.INT0IF = 0; // Reset interrupt flag
     //IEC0bits.INT0IE = 0; // Disable interrupt of button s5
@@ -48,7 +47,6 @@ void __attribute__((__interrupt__, __auto_psv__)) _INT0Interrupt() {
 
 // S6 buttons ISR
 // necessita controllo del bouncing 
-
 void __attribute__((__interrupt__, __auto_psv__)) _INT1Interrupt() {
     IFS1bits.INT1IF = 0; // Reset interrupt flag
 

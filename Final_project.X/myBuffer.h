@@ -19,6 +19,7 @@
 typedef struct{
     float indexTemp[TEMP_BUFF_DIM]; // celle dedicate 
     int writeTempIndex; // idice celle per scrittura dati
+    double averageTemp;
 }temperatureBuffer; //buffer for temperature
 
 typedef struct{
