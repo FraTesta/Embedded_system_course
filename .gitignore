@@ -1,5 +1,5 @@
-**/build
-**/debug
-**/dist
-**/nbproject
-**/makefile
+build
+debug
+dist
+nbproject
+makefile
