@@ -1,5 +1,5 @@
-build/default/production/main.o:  \
-main.c  \
+build/default/production/task.o:  \
+task.c  \
 timerFunc.h  \
 myADC.h  \
 parser.h  \

@@ -8,9 +8,20 @@
 #include <string.h>
 #include <stdio.h>
 #include "myUART.h"
+#include "myPWM.h"
 #include "xc.h"
 #include "myBuffer.h"
+#include "timerFunc.h"
+#include "buttons.h"
 #include "global_&_define.h"
+
+
+
+void __attribute__((__interrupt__, __auto_psv__)) _U2RXInterrupt() {
+    IFS1bits.U2RXIF = 0; // Reset rx interrupt flag
+    int val = U2RXREG; // Read from rx register
+    writeBuf(&UARTbuf, val); // Save value in buffer
+}
 
 void UART_config(int port) {
     switch (port) {
@@ -49,9 +60,5 @@ void send_string_UART2(char* msg) {
 
 }
 
-void __attribute__((__interrupt__, __auto_psv__)) _U2RXInterrupt() {
-    IFS1bits.U2RXIF = 0; // Reset rx interrupt flag
-    int val = U2RXREG; // Read from rx register
-    writeBuf(&UARTbuf, val); // Save value in buffer
-}
+
 

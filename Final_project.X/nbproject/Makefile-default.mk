@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c myADC.c myScheduler.c myUART.c parser.c timerFunc.c myBuffer.c myPWM.c buttons.c mySPI_LCD.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c myADC.c myScheduler.c myUART.c parser.c timerFunc.c myBuffer.c myPWM.c buttons.c mySPI_LCD.c task.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/myADC.o ${OBJECTDIR}/myScheduler.o ${OBJECTDIR}/myUART.o ${OBJECTDIR}/parser.o ${OBJECTDIR}/timerFunc.o ${OBJECTDIR}/myBuffer.o ${OBJECTDIR}/myPWM.o ${OBJECTDIR}/buttons.o ${OBJECTDIR}/mySPI_LCD.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/myADC.o.d ${OBJECTDIR}/myScheduler.o.d ${OBJECTDIR}/myUART.o.d ${OBJECTDIR}/parser.o.d ${OBJECTDIR}/timerFunc.o.d ${OBJECTDIR}/myBuffer.o.d ${OBJECTDIR}/myPWM.o.d ${OBJECTDIR}/buttons.o.d ${OBJECTDIR}/mySPI_LCD.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/myADC.o ${OBJECTDIR}/myScheduler.o ${OBJECTDIR}/myUART.o ${OBJECTDIR}/parser.o ${OBJECTDIR}/timerFunc.o ${OBJECTDIR}/myBuffer.o ${OBJECTDIR}/myPWM.o ${OBJECTDIR}/buttons.o ${OBJECTDIR}/mySPI_LCD.o ${OBJECTDIR}/task.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/myADC.o.d ${OBJECTDIR}/myScheduler.o.d ${OBJECTDIR}/myUART.o.d ${OBJECTDIR}/parser.o.d ${OBJECTDIR}/timerFunc.o.d ${OBJECTDIR}/myBuffer.o.d ${OBJECTDIR}/myPWM.o.d ${OBJECTDIR}/buttons.o.d ${OBJECTDIR}/mySPI_LCD.o.d ${OBJECTDIR}/task.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/myADC.o ${OBJECTDIR}/myScheduler.o ${OBJECTDIR}/myUART.o ${OBJECTDIR}/parser.o ${OBJECTDIR}/timerFunc.o ${OBJECTDIR}/myBuffer.o ${OBJECTDIR}/myPWM.o ${OBJECTDIR}/buttons.o ${OBJECTDIR}/mySPI_LCD.o
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/myADC.o ${OBJECTDIR}/myScheduler.o ${OBJECTDIR}/myUART.o ${OBJECTDIR}/parser.o ${OBJECTDIR}/timerFunc.o ${OBJECTDIR}/myBuffer.o ${OBJECTDIR}/myPWM.o ${OBJECTDIR}/buttons.o ${OBJECTDIR}/mySPI_LCD.o ${OBJECTDIR}/task.o
 
 # Source Files
-SOURCEFILES=main.c myADC.c myScheduler.c myUART.c parser.c timerFunc.c myBuffer.c myPWM.c buttons.c mySPI_LCD.c
+SOURCEFILES=main.c myADC.c myScheduler.c myUART.c parser.c timerFunc.c myBuffer.c myPWM.c buttons.c mySPI_LCD.c task.c
 
 
 
@@ -165,6 +165,13 @@ ${OBJECTDIR}/mySPI_LCD.o: mySPI_LCD.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  mySPI_LCD.c  -o ${OBJECTDIR}/mySPI_LCD.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/mySPI_LCD.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1    -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -I"C:/Program Files/Microchip/xc16/v1.60/support/dsPIC30F/h" -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp=${DFP_DIR}/xc16
 	@${FIXDEPS} "${OBJECTDIR}/mySPI_LCD.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/task.o: task.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/task.o.d 
+	@${RM} ${OBJECTDIR}/task.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  task.c  -o ${OBJECTDIR}/task.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/task.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1    -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -I"C:/Program Files/Microchip/xc16/v1.60/support/dsPIC30F/h" -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp=${DFP_DIR}/xc16
+	@${FIXDEPS} "${OBJECTDIR}/task.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 else
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -235,6 +242,13 @@ ${OBJECTDIR}/mySPI_LCD.o: mySPI_LCD.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/mySPI_LCD.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  mySPI_LCD.c  -o ${OBJECTDIR}/mySPI_LCD.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/mySPI_LCD.o.d"        -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -I"C:/Program Files/Microchip/xc16/v1.60/support/dsPIC30F/h" -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp=${DFP_DIR}/xc16
 	@${FIXDEPS} "${OBJECTDIR}/mySPI_LCD.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/task.o: task.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/task.o.d 
+	@${RM} ${OBJECTDIR}/task.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  task.c  -o ${OBJECTDIR}/task.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/task.o.d"        -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -I"C:/Program Files/Microchip/xc16/v1.60/support/dsPIC30F/h" -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp=${DFP_DIR}/xc16
+	@${FIXDEPS} "${OBJECTDIR}/task.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 
