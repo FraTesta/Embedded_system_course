@@ -33,7 +33,8 @@ int uC_state;
 int S6status;
 // urat buffer
 circularBuffer UARTbuf;
-
+// scheduler
+heart_beat schedInfo[MAX_TASK];
 // motors data struct 
 motorsData motor_data;
 // Parser state variable
@@ -102,8 +103,8 @@ void msg_handler(char* msg_type, char* msg_payload) {
 
             }
             break;
-
     }
+
 }
 
 
@@ -111,13 +112,10 @@ void msg_handler(char* msg_type, char* msg_payload) {
 ///////////////////////////////////////////////// TASKS ///////////////////////////////////////////////////
 
 void* task_PWM_controller(void* params) {
-
+    //refresh PWM
+    sendRPM(motor_data.leftRPM, motor_data.rightRPM);
 }
 
-/*
- * - check if max/min settati non supero il max/min consentito, in tal caso saturo tali variabili al loro massimo
- * - refresh
- */
 
 void* task_temperature_acquisition(void* params) {
     temperatureBuffer* tempBuf = (temperatureBuffer*) params;
@@ -127,7 +125,7 @@ void* task_temperature_acquisition(void* params) {
     int tempBits = ADCBUF1;
     float tempVolts = tempBits * 5.0 / 1024.0; // bits to Volt
     float temperature = (tempVolts - 0.75) * 100.0 + 25; // Volt to Deg
-    writeTempBuf(&tempBuf, temperature); //Write values on temperature buffer
+    writeTempBuf(tempBuf, temperature); //Write values on temperature buffer
     return 0;
 }
 // acquisizione dati temperatura (quindi ADC ....) 
@@ -150,9 +148,7 @@ void* task_send_temperature(void* params) {
     return NULL;
 }
 
-/* media dei valori di temp
- * send msg MCTEM
- */
+
 
 void* task_feedback_ack(void* params) {
     char msg[50];
@@ -212,7 +208,9 @@ void* task_LCD(void* params) {
         spi_put_string(rpmStr, FIRST_ROW + 0x04);
         //second row msg
         //the values of the duty cycle PWM registers
-        sprintf(rpmStr, "%.2f ,%.2f", PDC2 / (2 * PTPER), PDC3 / (2 * PTPER));
+        double dutyCycle1 = PDC2 / (2 * PTPER);
+        double dutyCycle2 = PDC3 / (2 * PTPER);
+        sprintf(rpmStr, "%.0f ,%.0f", dutyCycle1, dutyCycle2);
         spi_put_string(rpmStr, SECOND_ROW + 0x03);
 
     }
@@ -225,13 +223,15 @@ void* task_receiver(void* params) {
     char tempChar; // contains a char read from the UART buffer 
     int bufError;
     int parseFlag;
+    //refresh PWM
+    //sendRPM(motor_data.leftRPM, motor_data.rightRPM);
 
     // check if there is some unread data in the UART buffer
     // notice that this buffer is automatically 
     while (dataToRead(&UARTbuf) > 0) {
         bufError = readBuf(&UARTbuf, &UARTbyte); // Read msg from the UART buffer 
         tempChar = UARTbyte; // Convert int into corresponding char ascii code
-        parseFlag = parse_byte(&pstate, tempChar); // Parse each byte 
+        parseFlag = parse_byte(pstate, tempChar); // Parse each byte 
 
         if (parseFlag == NEW_MESSAGE) {
             msg_handler(pstate->msg_type, pstate->msg_payload); // Get type of message
@@ -250,15 +250,15 @@ int main(void) {
     // PWM init 
     PWM_config();
     // UART init
-    UART_config(2); // PROBABILMENTE DA CAMBIARE 
+    UART_config(UART_2); // PROBABILMENTE DA CAMBIARE 
 
 
     //////////////////////////////   Initialization Data   ///////////////////////////////////////////////
     // LED init 
     TRISBbits.TRISB0 = 0; // D3
     TRISBbits.TRISB1 = 0; // D4
+    
     // motor data init
-
     motor_data.leftRPM = 0;
     motor_data.rightRPM = 0;
     motor_data.maxRPM = MAX_PROPELLER;
@@ -267,6 +267,7 @@ int main(void) {
     // temperature buffer 
     temperatureBuffer tempBuf;
 
+    // initialization of the two buffers
     initBuf(&UARTbuf, &tempBuf, UART_BUFF_DIM);
     // init LCD mode
     S6status = S6_NOT_PRESSED;
@@ -276,6 +277,48 @@ int main(void) {
     // Init timer for TIMEOUT mode
     tmr_setup_period(TIMER3, 5000);
     IFS0bits.T3IF = 1; // enable timer 3 interrupt 
+    
+    schedInfo[0].task = &task_PWM_controller;
+    schedInfo[1].task = &task_temperature_acquisition;
+    schedInfo[2].task = &task_send_temperature;
+    schedInfo[3].task = &task_feedback_ack;
+    schedInfo[4].task = &task_LED_blink;
+    schedInfo[5].task = &task_LCD;
+    schedInfo[6].task = &task_receiver;
+    
+    schedInfo[0].params = NULL;
+    schedInfo[1].params = &tempBuf;
+    schedInfo[2].params = &tempBuf;
+    schedInfo[3].params = NULL;
+    schedInfo[4].params = NULL;
+    schedInfo[5].params = &tempBuf;
+    schedInfo[6].params = &pstate;
+    
+    // initialize n
+    schedInfo[0].n = 0;
+    schedInfo[1].n = 0;
+    schedInfo[2].n = 0;
+    schedInfo[3].n = 0;
+    schedInfo[4].n = 0;
+    schedInfo[5].n = 0;
+    schedInfo[6].n = 0;
+    
+    // set N according to the time of execution of each tasks
+    schedInfo[0].N = 0; // PWM controller 
+    schedInfo[1].N = 0; // Temperature Acquisition 10 Hz
+    schedInfo[2].N = 0; // Send temperature 1 Hz
+    schedInfo[3].N = 0; // Feedback 5 Hz
+    schedInfo[4].N = 0; // LED blink 1 Hz
+    schedInfo[5].N = 0; // LCD 10 Hz
+    schedInfo[6].N = 0; // Task Reciver 10 Hz
+ 
 
+    
+    // heartbeat time
+    tmr_setup_period(TIMER1, 5); //200 Hz = 5 ms 
+    while (1) {
+        scheduler(MAX_TASK, &schedInfo); // ora non devo più passare &si allo scheduler 
+        tmr_wait_period(TIMER1);
+    }
     return 0;
 }

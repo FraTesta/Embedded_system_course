@@ -26,6 +26,9 @@
 #define FCY 1843200
 #define F_PWM 1000
 
+// scheduler 
+#define MAX_TASK 7
+
 // messi tutti gli extern delle global variable per condividerli con altri file.c
 typedef struct{
     int maxRPM;
@@ -34,11 +37,13 @@ typedef struct{
     int rightRPM;
 }motorsData;
 
+extern heart_beat schedInfo[MAX_TASK];
 extern int uC_state;
 extern int S6status;
 extern circularBuffer UARTbuf;
 extern temperatureBuffer tempBuf;
 extern motorsData motor_data;
+
 
 
 

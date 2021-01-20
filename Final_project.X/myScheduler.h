@@ -15,5 +15,4 @@ typedef struct {
 
 void scheduler(int max_task, void* sched);
 
-
 #endif /* __cplusplus */

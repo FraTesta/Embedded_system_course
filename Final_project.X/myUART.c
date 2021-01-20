@@ -14,13 +14,13 @@
 
 void UART_config(int port) {
     switch (port) {
-        case UART1:
+        case UART_1:
             U1BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
             U1MODEbits.UARTEN = 1; //enable UART module 
             U1STAbits.UTXEN = 1; // enable transmission 
             
             break;
-        case UART2:
+        case UART_2:
             U2BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
             U2MODEbits.UARTEN = 1; //enable UART module 
             U2STAbits.UTXEN = 1; // enable transmission 

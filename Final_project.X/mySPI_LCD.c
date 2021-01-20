@@ -5,7 +5,7 @@
  * Created on 24 ottobre 2020, 12.09
  */
 
-#include "mySPI.h"
+#include "mySPI_LCD.h"
 
 void spi_config() {
     SPI1CONbits.MSTEN = 1; //enable Master mode

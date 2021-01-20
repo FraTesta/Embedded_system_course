@@ -3,8 +3,8 @@
 
 #include <xc.h> 
 
-#define UART1 1
-#define UART2 2
+#define UART_1 1
+#define UART_2 2
 
 void UART_config(int port);
 // sand a string through UART2
