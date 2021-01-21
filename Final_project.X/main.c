@@ -24,21 +24,21 @@
 #include "global_&_define.h"  // file.h which contains all global variables 
 #include "myBuffer.h"
 #include "buttons.h"
-#include "tasks.h"
+#include "tasks.h"  // contains all scheduled task 
 
 // The following are variables necessarily global since they are also used in some interrupt handler functions,
-//and in other project files:
-// microcontroller state 
+//and in other project files.
+// Microcontroller state 
 int uC_state;
-// flag for button S6
+// Flag for button S6
 int S6status;
-// urat buffer
+// UART circular buffer
 circularBuffer UARTbuf;
-// scheduler
+// Scheduler
 heart_beat schedInfo[MAX_TASK];
-// motors data struct 
-motorsData motor_data;
-// safe mode flag (per mandare l'ack quando un msg è arrivato )
+// Motors data struct (defined in the global & define file)
+motorsData motor_data; 
+// Safe mode flag (per mandare l'ack quando un msg è arrivato )
 int prevSafe = 0;
 
 
@@ -76,12 +76,11 @@ int main(void) {
     // Parser state variable
     parser_state pstate;
 
-    // Init timer for TIMEOUT mode 
-    // see the timerFunc.c file
+    // Init timer for TIMEOUT mode  (see the timerFunc.c file)
     tmr_setup_period(TIMER3, 5000);
     IFS0bits.T3IF = 1; // enable timer 3 interrupt 
 
-    // all the following task are defined into the tasks.c file 
+    // all the following tasks are defined into the task.c file 
     schedInfo[0].task = &task_PWM_controller;
     schedInfo[1].task = &task_temperature_acquisition;
     schedInfo[2].task = &task_send_temperature;
@@ -107,20 +106,22 @@ int main(void) {
     schedInfo[5].n = 0;
     schedInfo[6].n = 0;
 
-    // set N according to the time of execution of each tasks (N period = 100ms)
     // N[i] = period of task / heartbeat
-    schedInfo[0].N = 1; // PWM controller 
-    schedInfo[1].N = 1; // Temperature Acquisition 10 Hz
-    schedInfo[2].N = 10; // Send temperature 1 Hz
-    schedInfo[3].N = 2; // Feedback 5 Hz
-    schedInfo[4].N = 5; // LED blink 1 Hz (500ms on /500ms off)
-    schedInfo[5].N = 1; // LCD 10 Hz
-    schedInfo[6].N = 1; // Task Reciver 10 Hz
+    schedInfo[0].N = 1; // PWM controller 100 Hz
+    schedInfo[1].N = 10; // Temperature Acquisition 10 Hz
+    schedInfo[2].N = 100; // Send temperature 1 Hz
+    schedInfo[3].N = 20; // Feedback 5 Hz
+    schedInfo[4].N = 50; // LED blink 1 Hz (500ms on /500ms off)
+    schedInfo[5].N = 10; // LCD 10 Hz
+    schedInfo[6].N = 1; // Task Reciver 100 Hz 
+    // Since the bound rate is 9600 bps (to avoid buffer overflow in TX), Therfore the circular buffer 
+    //will be written quite fast. So we need a reciver which is not too slow to read (100 Hz), otherwise 
+    // some data might be ovrewritten before being processing.
 
 
 
     // heartbeat time
-    tmr_setup_period(TIMER1, 100); // 100 ms =  10 Hz 
+    tmr_setup_period(TIMER1, 10); // 10 ms =  100 Hz 
     while (1) {
         scheduler(MAX_TASK, &schedInfo); // ora non devo più passare &si allo scheduler 
         tmr_wait_period(TIMER1);

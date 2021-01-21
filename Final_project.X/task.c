@@ -23,6 +23,8 @@
 #include "buttons.h"
 #include "tasks.h"
 
+// function which manages messages sent via UART based on the state of the microcontroller
+// and the header of the message itself
 void msg_handler(char* msg_type, char* msg_payload) {
     // temporary local variables
     int tempRPM1 = 0;
@@ -30,6 +32,7 @@ void msg_handler(char* msg_type, char* msg_payload) {
     int tempMAXrpm = 0;
     int tempMINrpm = 0;
 
+    // it's a sort of FSM 
     switch (uC_state) {
         case TIMEOUT_MODE:
             // set motor to 0 this is done in the pwm task probably 
@@ -39,7 +42,7 @@ void msg_handler(char* msg_type, char* msg_payload) {
             if (strcmp(msg_type, "HLREF") == 0) {
                 uC_state = CONTROLLED_MODE;
                 // recursive call ?
-                msg_handler(msg_type, msg_payload);
+                msg_handler(msg_type, msg_payload); // to don't lose a msg 
             }
             break;
         case SAFE_MODE:
@@ -87,7 +90,8 @@ void msg_handler(char* msg_type, char* msg_payload) {
 }
 
 
-
+// Task which recives references from UART buffer and parse them
+// actually it reads the msgs contained in a circular buffer, which is filled using UART interupt  
 void* task_receiver(void* params) {
     parser_state* pstate = (parser_state*) params;
     int UARTbyte = 0; // byte read from UART
@@ -112,6 +116,7 @@ void* task_receiver(void* params) {
     return NULL;
 }
 
+// Task which write on the LCD different msg based on the status of button S6
 void* task_LCD(void* params) {
     temperatureBuffer* tempBuf = (temperatureBuffer*) params;
     char tempStr[5];
@@ -155,12 +160,14 @@ void* task_LCD(void* params) {
     return NULL;
 }
 
+// Task which refreshes the PWM values (RPM motor values)
 void* task_PWM_controller(void* params) {
     //refresh PWM
     sendRPM(motor_data.leftRPM, motor_data.rightRPM);
     return NULL;
 }
 
+// Task which reads temperature from sensors and loads them into a circular buffer
 void* task_temperature_acquisition(void* params) {
     temperatureBuffer* tempBuf = (temperatureBuffer*) params;
     while (ADCON1bits.DONE == 0);
@@ -173,6 +180,7 @@ void* task_temperature_acquisition(void* params) {
     return 0;
 }
 
+// Task which sends average temperature through UART 
 void* task_send_temperature(void* params) {
     temperatureBuffer* tempBuf = (temperatureBuffer*) params;
     int i;
@@ -191,6 +199,7 @@ void* task_send_temperature(void* params) {
     return NULL;
 }
 
+// Task which send feedback ack through UART
 void* task_feedback_ack(void* params) {
     char msg[50];
     // prepare msg
@@ -200,6 +209,7 @@ void* task_feedback_ack(void* params) {
     return NULL;
 }
 
+// Task which blinks led D3 and D4 when the uC is in TIMEOUT mode
 void* task_LED_blink(void* params) {
     // Blink led D3
     LATBbits.LATB0 = !LATBbits.LATB0; // turn the Led D3 on and off

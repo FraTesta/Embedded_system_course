@@ -171,7 +171,6 @@ void restart_TIMEOUT_timer() {
 }
 
 // Timer 3 ISR - to bring the microcontroller in the TIMEOUT mode 
-
 void __attribute__((__interrupt__, __auto_psv__)) _T3Interrupt() {
     IFS0bits.T3IF = 0; // Reset the flag of timer 3
     IEC0bits.T3IE = 0; // Disable interrupt of timer t2

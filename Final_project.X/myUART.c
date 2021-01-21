@@ -15,12 +15,14 @@
 #include "buttons.h"
 #include "global_&_define.h"
 
+// UART2 ISR to write incoming data to the circular buffer before the UART buffer overflows
 void __attribute__((__interrupt__, __auto_psv__)) _U2RXInterrupt() {
     IFS1bits.U2RXIF = 0; // Reset rx interrupt flag
     int val = U2RXREG; // Read from rx register
     writeBuf(&UARTbuf, val); // Save value in buffer
 }
 
+// to configure a port of the UART periferal 
 void UART_config(int port) {
     switch (port) {
         case UART_1:
@@ -43,7 +45,6 @@ void UART_config(int port) {
 }
 
 // sand a string through UART2
-
 void send_string_UART2(char* msg) {
     // If buffer is not full
 
