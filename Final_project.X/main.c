@@ -49,8 +49,9 @@ int main(void) {
     // PWM init 
     PWM_config();
     // UART init
-    UART_config(UART_2); // PROBABILMENTE DA CAMBIARE 
-
+    UART_config(UART_2); 
+    // SPI init 
+    spi_config();
 
     //////////////////////////////   Initialization Data   ///////////////////////////////////////////////
     // LED init 
@@ -66,19 +67,21 @@ int main(void) {
     // temperature buffer 
     temperatureBuffer tempBuf;
 
-    // initialization of the two buffers
+    // initialization of the two buffers (see myBuffer.c file)
     initBuf(&UARTbuf, &tempBuf, UART_BUFF_DIM);
-    // init LCD mode
+    // init the button S6 status which represent the mode of the lcd 
     S6status = S6_NOT_PRESSED;
     // init microcontroller mode 
     uC_state = CONTROLLED_MODE;
     // Parser state variable
     parser_state pstate;
 
-    // Init timer for TIMEOUT mode
+    // Init timer for TIMEOUT mode 
+    // see the timerFunc.c file
     tmr_setup_period(TIMER3, 5000);
     IFS0bits.T3IF = 1; // enable timer 3 interrupt 
 
+    // all the following task are defined into the tasks.c file 
     schedInfo[0].task = &task_PWM_controller;
     schedInfo[1].task = &task_temperature_acquisition;
     schedInfo[2].task = &task_send_temperature;
@@ -104,19 +107,20 @@ int main(void) {
     schedInfo[5].n = 0;
     schedInfo[6].n = 0;
 
-    // set N according to the time of execution of each tasks
-    schedInfo[0].N = 0; // PWM controller 
-    schedInfo[1].N = 0; // Temperature Acquisition 10 Hz
-    schedInfo[2].N = 0; // Send temperature 1 Hz
-    schedInfo[3].N = 0; // Feedback 5 Hz
-    schedInfo[4].N = 0; // LED blink 1 Hz
-    schedInfo[5].N = 0; // LCD 10 Hz
-    schedInfo[6].N = 0; // Task Reciver 10 Hz
+    // set N according to the time of execution of each tasks (N period = 100ms)
+    // N[i] = period of task / heartbeat
+    schedInfo[0].N = 1; // PWM controller 
+    schedInfo[1].N = 1; // Temperature Acquisition 10 Hz
+    schedInfo[2].N = 10; // Send temperature 1 Hz
+    schedInfo[3].N = 2; // Feedback 5 Hz
+    schedInfo[4].N = 5; // LED blink 1 Hz (500ms on /500ms off)
+    schedInfo[5].N = 1; // LCD 10 Hz
+    schedInfo[6].N = 1; // Task Reciver 10 Hz
 
 
 
     // heartbeat time
-    tmr_setup_period(TIMER1, 5); //200 Hz = 5 ms 
+    tmr_setup_period(TIMER1, 100); // 100 ms =  10 Hz 
     while (1) {
         scheduler(MAX_TASK, &schedInfo); // ora non devo più passare &si allo scheduler 
         tmr_wait_period(TIMER1);

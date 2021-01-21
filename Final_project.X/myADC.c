@@ -10,10 +10,11 @@
 
 // ADC configuration 
 void adc_config(int port){
-    ADCON3bits.ADCS = 8; //TAD value
+    // 10 Hz acquisition temperature func 
+    ADCON3bits.ADCS = 63; //TAD value
     ADCON1bits.ASAM = 1; //automatic sampling start
     //automatic conversion start
-    ADCON3bits.SAMC = 1;
+    ADCON3bits.SAMC = 15;  // Sample time 15 Tad: how long the sampling should last [0 Tad - 31 Tad]
     ADCON1bits.SSRC = 7; 
     ADCON2bits.CHPS = 0; // set channel 0
     //select input  

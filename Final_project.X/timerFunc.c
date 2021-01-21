@@ -92,7 +92,7 @@ void tmr_setup_period(int timer, int ms) {
     // if ms = 5000 (in question 3) ->  5000/1000 = 5 
     // -> 1843200 * 5 = 9216000 So i could use a prescale of 16 -> 9216000 / 16 = 576000 but it is over
     // so I m gonna chose 64 bits of precale 
-    
+
     int pr;
     int tckps;
 
@@ -161,29 +161,26 @@ void tmr_wait_period(int timer) {
 }
 
 // evrey time a new reference is recived 
-void restart_TIMEOUT_timer(){
-    T3CONbits.TON = 0;      // Stops the timer
-    IEC0bits.T3IE = 1;      // Enable timer 3 interrupt
+
+void restart_TIMEOUT_timer() {
+    T3CONbits.TON = 0; // Stops the timer
+    IEC0bits.T3IE = 1; // Enable timer 3 interrupt
     TMR3 = 0;
-    IFS0bits.T3IF = 0;      // Set the timer flag to zero to be notified of a new event
-    T3CONbits.TON = 1;      // Starts the timer
+    IFS0bits.T3IF = 0; // Set the timer flag to zero to be notified of a new event
+    T3CONbits.TON = 1; // Starts the timer
 }
 
 // Timer 3 ISR - to bring the microcontroller in the TIMEOUT mode 
-void __attribute__((__interrupt__, __auto_psv__)) _T3Interrupt () {
-    IFS0bits.T3IF = 0;          // Reset the flag of timer 3
-    IEC0bits.T3IE = 0;         // Disable interrupt of timer t2
+
+void __attribute__((__interrupt__, __auto_psv__)) _T3Interrupt() {
+    IFS0bits.T3IF = 0; // Reset the flag of timer 3
+    IEC0bits.T3IE = 0; // Disable interrupt of timer t2
     // Set timeout state
     uC_state = TIMEOUT_MODE;
-   /* // Set motor velocity to zero
-    int rpm1 = 0;
-    int rpm2 = 0;
-    // Set duty cycle to zero
-    normalizeDC(&rpm1, &rpm2);
-    // Set RPM to be printed to zero
-    actualRPM1 = 0;
-    actualRPM2 = 0;
-    */
-     
-    T3CONbits.TON = 0;          // Stop the timer
+    motor_data.leftRPM = 0;
+    motor_data.rightRPM = 0;  // these RPMs will be set at the next PWM refresh
+    //they do not necessarily have to be set to 0 immediately
+
+    T3CONbits.TON = 0; // Stop the timer
+    TMR2 = 0; // reset timer 
 }

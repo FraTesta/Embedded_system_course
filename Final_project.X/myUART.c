@@ -15,8 +15,6 @@
 #include "buttons.h"
 #include "global_&_define.h"
 
-
-
 void __attribute__((__interrupt__, __auto_psv__)) _U2RXInterrupt() {
     IFS1bits.U2RXIF = 0; // Reset rx interrupt flag
     int val = U2RXREG; // Read from rx register
@@ -29,14 +27,15 @@ void UART_config(int port) {
             U1BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
             U1MODEbits.UARTEN = 1; //enable UART module 
             U1STAbits.UTXEN = 1; // enable transmission 
-            
+
             break;
         case UART_2:
             U2BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
             U2MODEbits.UARTEN = 1; //enable UART module 
             U2STAbits.UTXEN = 1; // enable transmission 
-            
-            IEC1bits.U2RXIE = 1;        // Enable rx interrupt for UART
+            U2STAbits.URXISEL = 2; // 3/4 UART Buffer generates interrupt 
+            IEC1bits.U2RXIE = 1; // Enable rx interrupt for UART
+
             break;
 
     }
@@ -46,10 +45,11 @@ void UART_config(int port) {
 // sand a string through UART2
 
 void send_string_UART2(char* msg) {
-    if (U2STAbits.UTXBF == 0) { // If buffer is not full
+    // If buffer is not full
 
-        int i;
-        for (i = 0; i < strlen(msg) + 1; i++) {
+    int i;
+    for (i = 0; i < strlen(msg) + 1; i++) {
+        if (U2STAbits.UTXBF == 0) {
             U2TXREG = msg[i];
         }
     }

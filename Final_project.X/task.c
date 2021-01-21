@@ -194,7 +194,7 @@ void* task_send_temperature(void* params) {
 void* task_feedback_ack(void* params) {
     char msg[50];
     // prepare msg
-    sprintf(msg, "MCFBK,%d,%d,%d", motor_data.leftRPM, motor_data.rightRPM, uC_state);
+    sprintf(msg, "$MCFBK,%d,%d,%d*", motor_data.leftRPM, motor_data.rightRPM, uC_state);
     //send to 
     send_string_UART2(msg);
     return NULL;
