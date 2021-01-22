@@ -42,8 +42,8 @@ int readBuf(circularBuffer *buf, int *data) {
     // reading 
     *data = buf->index[buf->readIndex];
     buf->readIndex++;
-    if (buf->readIndex == buf->dim) { //check if I have to restart from the first cell
-        buf->readIndex = 0;
+    if (buf->readIndex == buf->dim) { //check if I have to restart from the first cell of the buffer 
+        buf->readIndex = 0;  // reset the read index
     }
     IEC1bits.U2RXIE = 1; // Enable interrupt of UART
     return 1;
@@ -51,10 +51,10 @@ int readBuf(circularBuffer *buf, int *data) {
 
 // tell us whether there are new data in the buffer 
 int dataToRead(circularBuffer *buf) {
-    // the size is the number of cells in the CIRCULAR buffer which have still to be read.
+    
     if (buf->writeIndex >= buf->readIndex) {
         return (buf->writeIndex - buf->readIndex);
-    } else {
+    } else {// case in which the buffer is overwriting 
         return (buf->dim - (buf->readIndex - buf->writeIndex));
     }
     return -1; // Something went wrong

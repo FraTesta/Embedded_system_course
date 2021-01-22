@@ -38,8 +38,7 @@ circularBuffer UARTbuf;
 heart_beat schedInfo[MAX_TASK];
 // Motors data struct (defined in the global & define file)
 motorsData motor_data; 
-// Safe mode flag (per mandare l'ack quando un msg è arrivato )
-int prevSafe = 0;
+
 
 
 int main(void) {
@@ -106,22 +105,22 @@ int main(void) {
     schedInfo[5].n = 0;
     schedInfo[6].n = 0;
 
-    // N[i] = period of task / heartbeat
-    schedInfo[0].N = 1; // PWM controller 100 Hz
-    schedInfo[1].N = 10; // Temperature Acquisition 10 Hz
-    schedInfo[2].N = 100; // Send temperature 1 Hz
-    schedInfo[3].N = 20; // Feedback 5 Hz
-    schedInfo[4].N = 50; // LED blink 1 Hz (500ms on /500ms off)
-    schedInfo[5].N = 10; // LCD 10 Hz
-    schedInfo[6].N = 1; // Task Reciver 100 Hz 
-    // Since the bound rate is 9600 bps (to avoid buffer overflow in TX), Therfore the circular buffer 
-    //will be written quite fast. So we need a reciver which is not too slow to read (100 Hz), otherwise 
-    // some data might be ovrewritten before being processing.
+    // N[i] =  heartbeat / period of task 
+    schedInfo[0].N = 1; // PWM controller 50 Hz
+    schedInfo[1].N = 5; // Temperature Acquisition 10 Hz
+    schedInfo[2].N = 50; // Send temperature 1 Hz
+    schedInfo[3].N = 10; // Feedback 5 Hz
+    schedInfo[4].N = 25; // LED blink 1 Hz (500ms on /500ms off = 2 Hz)
+    schedInfo[5].N = 5; // LCD 10 Hz
+    schedInfo[6].N = 1; // Task Reciver 50 Hz 
+    // Since the bound rate is 9600 bps (to avoid UART buffer overflow in TX), therfore the circular buffer
+    //will be written quite fast. So we need a reciver which is not too slow to read (50 Hz), otherwise 
+    // some data might be ovrewritten before being processing. 
 
 
 
     // heartbeat time
-    tmr_setup_period(TIMER1, 10); // 10 ms =  100 Hz 
+    tmr_setup_period(TIMER1, 50); // 10 ms =  100 Hz 
     while (1) {
         scheduler(MAX_TASK, &schedInfo); // ora non devo più passare &si allo scheduler 
         tmr_wait_period(TIMER1);

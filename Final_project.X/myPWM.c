@@ -11,7 +11,6 @@
 
 // configuration for 2 PWM signals 
 void PWM_config() {
-    // PWM period 20 ms = 50 Hz
     PTCONbits.PTMOD = 0;
     // set positive PWM signals
     PWMCON1bits.PEN2H = 1; // set port PWM2H

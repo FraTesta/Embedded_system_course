@@ -9,6 +9,20 @@
 #include "timerFunc.h"
 #include "global_&_define.h"
 
+// Timer 3 ISR - to bring the microcontroller in the TIMEOUT mode 
+void __attribute__((__interrupt__, __auto_psv__)) _T3Interrupt() {
+    IFS0bits.T3IF = 0; // Reset the flag of timer 3
+    IEC0bits.T3IE = 0; // Disable interrupt of timer t2
+    // Set timeout state
+    uC_state = TIMEOUT_MODE;
+    motor_data.leftRPM = 0;
+    motor_data.rightRPM = 0;  // these RPMs will be set at the next PWM refresh
+    //they do not necessarily have to be set to 0 immediately
+
+    T3CONbits.TON = 0; // Stop the timer
+    TMR2 = 0; // reset timer 
+}
+
 void choose_prescaler(int ms, int *pr, int* tckps) {
     // Fosc = 7.3728 MHz
     // Fcy = 7.3728/4 = 1843200 Hz
@@ -170,16 +184,3 @@ void restart_TIMEOUT_timer() {
     T3CONbits.TON = 1; // Starts the timer
 }
 
-// Timer 3 ISR - to bring the microcontroller in the TIMEOUT mode 
-void __attribute__((__interrupt__, __auto_psv__)) _T3Interrupt() {
-    IFS0bits.T3IF = 0; // Reset the flag of timer 3
-    IEC0bits.T3IE = 0; // Disable interrupt of timer t2
-    // Set timeout state
-    uC_state = TIMEOUT_MODE;
-    motor_data.leftRPM = 0;
-    motor_data.rightRPM = 0;  // these RPMs will be set at the next PWM refresh
-    //they do not necessarily have to be set to 0 immediately
-
-    T3CONbits.TON = 0; // Stop the timer
-    TMR2 = 0; // reset timer 
-}

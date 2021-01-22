@@ -26,13 +26,13 @@ void __attribute__((__interrupt__, __auto_psv__)) _U2RXInterrupt() {
 void UART_config(int port) {
     switch (port) {
         case UART_1:
-            U1BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
+            U1BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) 
             U1MODEbits.UARTEN = 1; //enable UART module 
             U1STAbits.UTXEN = 1; // enable transmission 
 
             break;
         case UART_2:
-            U2BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) of transmission
+            U2BRG = 11; //    (1843200)/(16*(9600))  set the bound rate (9600) 
             U2MODEbits.UARTEN = 1; //enable UART module 
             U2STAbits.UTXEN = 1; // enable transmission 
             U2STAbits.URXISEL = 2; // 3/4 UART Buffer generates interrupt 

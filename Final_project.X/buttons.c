@@ -27,26 +27,27 @@ void resetButtonS5() {
     IEC0bits.INT0IE = 1; // Enable interrupt for S5 button
 }
 
-// S5 button ISR
+// S5 button ISR to switch the uC into SAFE_MODE state 
 // non importa del bouncing tanto attiva solo un flag (non cambia lo stato precedente come in S6)
+// We don't care about bouncing since this interrupt set the flag only to 1 keeping such value.
+
 void __attribute__((__interrupt__, __auto_psv__)) _INT0Interrupt() {
     IFS0bits.INT0IF = 0; // Reset interrupt flag
-    //IEC0bits.INT0IE = 0; // Disable interrupt of button s5
 
-    // Set safe state -> halt
+    // Set SAFE_MODE = halt
     uC_state = SAFE_MODE;
 
-    // Stop motors
-    int rpm1 = 0;
-    int rpm2 = 0;
-    sendRPM(rpm1, rpm2);
-    motor_data.leftRPM = rpm1;
-    motor_data.rightRPM = rpm2;
+    // Stop motors immediatly
+    motor_data.leftRPM = 0;
+    motor_data.rightRPM = 0;
+    sendRPM(0, 0);
+
 
 }
 
 // S6 buttons ISR
 // necessita controllo del bouncing 
+
 void __attribute__((__interrupt__, __auto_psv__)) _INT1Interrupt() {
     IFS1bits.INT1IF = 0; // Reset interrupt flag
 
